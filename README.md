@@ -1,47 +1,74 @@
-# Twitter Tweet Predictor Web Application
+# Cmd Engine
  
 
 # Introduction
  
-With the increase in data driven techniques being developed methods to integrate such models within web application environments is a vital necessity. Data flows through websites and with proper systems in place that data can be used to cater to the user experience or be extracted for the solving of real world problems. This demo application aims to be an example of this relationship. The system takes in data in real time from the twitter api and learns to predict which twitter user is most likely to say a given phrase. THis process uses Natural Language Processing to dissect text and logistic regression to make predictions
+There exist many algorithms that have been designed and developed over the years to accomplish goals. Here I display several algorithms written in the python programming language that pertain to 3d graphics. The primary method for creating this virtual space is through a process called Ray-Casting, a process of shooting out columns of rays into 2d space and producing the illusion of 3d space through a measure of distance and angle.
  
 ## Usage
  
-Users can use the interactive front end to search any public twitter account and upload that account’s historical tweet data. Of the uploaded user accounts two users can then be selected, the model will then predict which user is most likely to say a provided tweet.
+Users can clone the repo and run files in the versions folder to test the engine. Since the cmd engine’s creation, several optimizations have been made in both the performance and visual appeal space.
 
-WARNING!!! the app uses free heroku services. Load times will be slow!!!
-Check out the app [HERE!](https://tyler9937-twitoff.herokuapp.com/)
+Example Images:
+![]()
 
 
  
-## Models used
+## Algorithms used
  
-This application uses a Logistic Regression model that is trained in real time on tokenized tweet data.
- 
-The following is a sample of the model’s code
+This project primarily uses the Ray-Casting algorithm to produce 3d graphics in the CMD. This algorithm was inspired by both the Wolfenstein 3D game and this project was inspired by youtuber javidx9 who wrote these algorithms in C++.
  
 ```python
-def predict_user(user1_name, user2_name, tweet_text):
+while bHitWall == False and fDistanceToWall < fDepth:
 
-    # Query Users
-    user1 = User.query.filter(User.name == user1_name).one()
-    user2 = User.query.filter(User.name == user2_name).one()
+            fDistanceToWall += fStepSize
+            nTestX = int(fPlayerX + fEyeX * fDistanceToWall)
+            nTestY = int(fPlayerY + fEyeY * fDistanceToWall)
 
-    # Process Data
-    user1_embeddings = np.array([tweet.embedding for tweet in user1.tweets])
-    user2_embeddings = np.array([tweet.embedding for tweet in user2.tweets])
+            # Test if ray is out of bounds
+            if nTestX < 0 or nTestX >= nMapWidth or nTestY < 0 or nTestY >= nMapHeight:
 
-    embeddings = np.vstack([user1_embeddings, user2_embeddings])
-    labels = np.concatenate([np.ones(len(user1.tweets)),
-                            np.zeros(len(user2.tweets))])
+                bHitWall = True         # Just set distance to maximum depth
+                fDistanceToWall = fDepth
 
-    # Fits Logistic Regression Model                      
-    log_reg = LogisticRegression().fit(embeddings, labels)
-    tweet_embedding = BASILICA.embed_sentence(tweet_text, model='twitter')
+            else:
 
-    return log_reg.predict(np.array(tweet_embedding).reshape(1,-1))
+                # Ray is inbounds so test to see if the ray cell is a wall block
+                if map[nTestY][nTestX] == '#':
+
+                    # Ray has hit wall
+                    bHitWall = True
+
+                    # To highlight tile boundaries, cast a ray from each corner
+                    # of the tile, to the player. The more coincident this ray
+                    # is to the rendering ray, the closer we are to a tile 
+                    # boundary, which we'll shade to add detail to the walls
+                    p = []
+
+                    # Test each corner of hit tile, storing the distance from
+				    # the player, and the calculated dot product of the two rays
+                    for tx in range(0,2):
+                        for ty in range(0,2):
+
+                            # Angle of corner to eye
+                            vy = float(nTestY) + ty - fPlayerY
+                            vx = float(nTestX) + tx - fPlayerX
+                            d = sqrt(vx*vx + vy*vy)
+                            dot = (fEyeX * vx / d) + (fEyeY * vy / d)
+                            p.append((d, dot))
+                    
+                    # Sort Pairs from closest to farthest
+                    p.sort(key=lambda x: x[0])
+
+                    # First two/three are closest (we will never see all four)
+                    fBound = 0.01
+                    if math.acos(p[0][1]) < fBound: bBoundary = True
+                    if math.acos(p[1][1]) < fBound: bBoundary = True
+                    if math.acos(p[2][1]) < fBound: bBoundary = True
 ```
  
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
  
+
+
