@@ -10,8 +10,7 @@ There exist many algorithms that have been designed and developed over the years
 Users can clone the repo and run files in the versions folder to test the engine. Since the cmd engine’s creation, several optimizations have been made in both the performance and visual appeal space.
 
 Example Images:
-![]("images/cmd1.png")
-![]("images/cmd2.png")
+
 
 
 
