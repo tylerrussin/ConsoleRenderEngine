@@ -53,7 +53,6 @@ while 1:
     elapsedTime = tp2 - tp1
     tp1 = tp2
     fElapsedTime = elapsedTime
-    print(fElapsedTime)
 
     # Handle CCW Rotation
     if keyboard.is_pressed('A'):
@@ -202,12 +201,8 @@ while 1:
             
     screen[int(fPlayerY)+1][int(fPlayerX)] = 'P'
 
-    # Display Frame
-    screen[nScreenHeight - 1][nScreenWidth - 1] = '\0'
-  
-    test = ''.join(ele for sub in screen for ele in sub)
-    print(test)
-
+    # Display Frame (problem with the \0 in python 3.9. empty string also works. null termination only needed for c++ version)
+    screen[nScreenHeight - 1][nScreenWidth - 1] = ''
     view.addstr(0, 0, ''.join(ele for sub in screen for ele in sub))
     view.refresh()
     
