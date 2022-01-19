@@ -74,7 +74,7 @@ class Game():
         elapsed_time = elapsed_time
 
         # exits game loop
-        if keyboard.is_pressed('Q'):
+        if keyboard.is_pressed('P'):
             # Changing back to default font size
             command_line_font(16)
             sys.exit()
@@ -108,6 +108,9 @@ class Game():
 
                 self.player_x += math.sin(self.player_a) * self.speed * elapsed_time
                 self.player_y += math.cos(self.player_a) * self.speed * elapsed_time
+
+        # Handle leftward movement & collision
+        # if keyboard. I left here 
 
         for x in range(0, self.screen_width):
 
