@@ -61,11 +61,11 @@ def getMarixString(m):
     return x
 
 
-tp1 = time.clock()
-tp2 = time.clock()
+tp1 = time.perf_counter()
+tp2 = time.perf_counter()
 
 # while True:
-#     tp2 = time.clock()
+#     tp2 = time.perf_counter()
 #     elapsedTime = tp2 - tp1
 #     tp1 = tp2
 #     fElapsedTime = float(elapsedTime)
@@ -90,7 +90,7 @@ while True:
     
 
 
-    tp2 = time.clock()
+    tp2 = time.perf_counter()
     elapsedTime = tp2 - tp1
     tp1 = tp2
     fElapsedTime = float(elapsedTime)
@@ -190,16 +190,16 @@ while True:
         for y in range(0, nScreenHeight):
             if y < nCeiling:
                 screen[y][x] = nShade
-                screen[nScreenHeight - 1][nScreenWidth - 1] = '\0'
+                screen[nScreenHeight - 1][nScreenWidth - 1] = ''
                 view.addstr(y, x, str(screen[y][x]), curses.color_pair(2))
             elif y > nCeiling and y <= nFloor:
                 if bBoundary:
                     screen[y][x] = nShade2
-                    screen[nScreenHeight - 1][nScreenWidth - 1] = '\0'
+                    screen[nScreenHeight - 1][nScreenWidth - 1] = ''
                     view.addstr(y, x, str(screen[y][x]), curses.color_pair(3))
                 else:
                     screen[y][x] = nShade
-                    screen[nScreenHeight - 1][nScreenWidth - 1] = '\0'
+                    screen[nScreenHeight - 1][nScreenWidth - 1] = ''
                     view.addstr(y, x, str(screen[y][x]), curses.color_pair(1))
             else:
                 b = 1.0 - ((float(y) - nScreenHeight / 2.0) / (float(nScreenHeight) / 2.0))
@@ -209,11 +209,11 @@ while True:
                 elif b < 0.8:       nShade2 = u'\u2591'
                 else:               nShade2 = " "
                 screen[y][x] = nShade2
-                screen[nScreenHeight - 1][nScreenWidth - 1] = '\0'
+                screen[nScreenHeight - 1][nScreenWidth - 1] = ''
                 view.addstr(y, x, str(screen[y][x]), curses.color_pair(2))
 
-    # screen[nScreenHeight - 1][nScreenWidth - 1] = '\0'
-    # map[nMapWidth - 1][nMapHeight - 1] = '\0'
+    # screen[nScreenHeight - 1][nScreenWidth - 1] = ''
+    # map[nMapWidth - 1][nMapHeight - 1] = ''
     # view = curses.initscr()
     # view.addstr(0, 0, getMarixString(screen))
     # view.addstr(0, 0, getMarixString(map))
@@ -224,23 +224,23 @@ while True:
         for ny in range(0, nMapWidth):
             # screen[ny + 1][nx] = map[ny][nx]
             # screen[int(fPlayerY)+1][int(fPlayerX)] = 'P'
-            screen[nScreenHeight - 1][nScreenWidth - 1] = '\0'
+            screen[nScreenHeight - 1][nScreenWidth - 1] = ''
             view.addstr(ny + 1, nx, str(map[ny][nx]), curses.color_pair(1))
             
 
     try:
         
-        # screen[nScreenHeight - 1][nScreenWidth - 1] = '\0'
+        # screen[nScreenHeight - 1][nScreenWidth - 1] = ''
         # view = curses.initscr()
         # for index_c, col in enumerate(screen):
         #     for index_r, row in enumerate(col):
         #         view.addstr(index_c, index_r, str(screen[index_c][index_r][0]))#, screen[index_c][index_r][1])
-        screen[nScreenHeight - 1][nScreenWidth - 1] = '\0'
+        screen[nScreenHeight - 1][nScreenWidth - 1] = ''
         view.addstr(int(fPlayerY), int(fPlayerX), 'P', curses.color_pair(1))
-        screen[nScreenHeight - 1][nScreenWidth - 1] = '\0'
+        screen[nScreenHeight - 1][nScreenWidth - 1] = ''
         view.addstr(0,0, f'X={fPlayerX}, Y={fPlayerY}, A={fPlayerA}, FPS={1.0 / fElapsedTime}')
 
-        view.addstr(nScreenHeight - 1, nScreenWidth -1 , '\0', curses.color_pair(1))
+        view.addstr(nScreenHeight - 1, nScreenWidth -1 , '', curses.color_pair(1))
         view.refresh()
     except:
         pass
@@ -249,7 +249,7 @@ while True:
 
 
     # # for the map
-    # map[nMapWidth - 1][nMapHeight - 1] = '\0'
+    # map[nMapWidth - 1][nMapHeight - 1] = ''
     # curses.initscr()
     # my_window = curses.newwin(17, 16, 1, 0)
     # for index_c, col in enumerate(map):

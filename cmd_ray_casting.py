@@ -11,6 +11,7 @@ from maps.Map_Three import map_three
 from maps.Map_Four import map_four
 from maps.Map_Five import map_five
 from functions.Map_Select import map_select
+from functions.Command_Line_Font import command_line_font
 
 class Game():
 
@@ -64,7 +65,7 @@ class Game():
         self.tp2 = time.perf_counter()
 
     def on_user_update(self):
-         # We'll need time differential per frame to calculate modification
+        # We'll need time differential per frame to calculate modification
         # to movement speeds, to ensure consistant movement, as ray-tracing
         # is non-deterministic
         self.tp2 = time.perf_counter()
@@ -74,6 +75,8 @@ class Game():
 
         # exits game loop
         if keyboard.is_pressed('Q'):
+            # Changing back to default font size
+            command_line_font(16)
             sys.exit()
 
         # Handle CCW Rotation
@@ -183,9 +186,9 @@ class Game():
             elif distance_to_wall < self.depth / 3.0:        shade = u'\u2593'
             elif distance_to_wall < self.depth / 2.0:        shade = u'\u2592'
             elif distance_to_wall < self.depth:              shade = u'\u2591'
-            else:                                       shade = ' '        # Too far away
+            else:                                            shade = ' '        # Too far away
 
-            if boundary:       shade = ' ' # Black it out
+            if boundary:                                     shade = ' ' # Black it out
 
             for y in range(0, self.screen_height):
 
@@ -232,8 +235,12 @@ class Game():
 # Initiate game loop
 game = Game()
 game.on_user_create()
-while True:
-    game.on_user_update()    
 
+# Command Line Formatting
+command_line_font(16)
+
+while True:
+    
+    game.on_user_update()
 
 # That's It!! - Tyler

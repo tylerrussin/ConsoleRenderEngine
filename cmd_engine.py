@@ -1,7 +1,7 @@
 import os
 import sys
 import math
-time
+import time
 import keyboard
 import curses
 
@@ -10,8 +10,9 @@ from math import sqrt
 hello = 120          # console screen size x (columns)
 nmapheight = 16
 nscreenheight = 40          # console screen size y (rows)
+nscreenwidth = 120
 nmapwidth = 16
-i
+
 fplayerx = 14.7             # player start position
 fplayery = 5.09
 fplayera = 0.0              # player start rotation
@@ -43,8 +44,8 @@ map.append(list('#......#########'))
 map.append(list('#..............#'))
 map.append(list('################'))
 
-tp1 = time.clock()
-tp2 = time.clock()
+tp1 = time.perf_counter()
+tp2 = time.perf_counter()
 
 # cache to hold martrix lookups
 import numpy
@@ -169,7 +170,7 @@ cache = {}
 #             screen[int(fplayery)+1][int(fplayerx)] = 'p'
 
 #             # display frame
-#             screen[nscreenheight - 1][nscreenwidth - 1] = '\0'
+#             screen[nscreenheight - 1][nscreenwidth - 1] = ''
 #             string_screen = ''.join(ele for sub in screen for ele in sub)
 
 #             # adding saved screen to cache
@@ -201,7 +202,7 @@ while 1:
     # we'll need time differential per frame to calculate modification
     # to movement speeds, to ensure consistant movement, as ray-tracing
     # is non-deterministic
-    tp2 = time.clock()
+    tp2 = time.perf_counter()
     elapsedtime = tp2 - tp1
     tp1 = tp2
     felapsedtime = elapsedtime
@@ -362,7 +363,7 @@ while 1:
         screen[int(fplayery)+1][int(fplayerx)] = 'p'
 
         # display frame
-        screen[nscreenheight - 1][nscreenwidth - 1] = '\0'
+        screen[nscreenheight - 1][nscreenwidth - 1] = ''
         string_screen = ''.join(ele for sub in screen for ele in sub)
 
         # adding saved screen to cache
