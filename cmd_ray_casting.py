@@ -5,15 +5,18 @@ import time
 import keyboard
 import curses
 
-from math import sqrt
+from maps.Map_One import map_one
+from maps.Map_Two import map_two
+from maps.Map_Three import map_three
+from maps.Map_Four import map_four
+from maps.Map_Five import map_five
+from functions.Map_Select import map_select
 
 screen_width = 120          # Console Screen Size X (columns)
 screen_height = 40          # Console Screen Size Y (rows)
 map_height = 16
 map_width = 16
 
-player_x = 14.7             # Player Start Position
-player_y = 5.09
 player_a = 0.0              # Player Start Rotation
 fov = 3.14159 / 4.0        # Field of View
 depth = 16.0               # Maximum rendering distance
@@ -23,25 +26,26 @@ speed = 5.0                # Walking Speed
 screen = [[0 for x in range(screen_width)] for y in range(screen_height)]
 os.system(f"mode con: cols={screen_width} lines={screen_height}")
 
-# Create Map of world space # = wall block, . = space
-map = []
-map.append(list('#########.......'))
-map.append(list('#...............'))
-map.append(list('#.......########'))
-map.append(list('#..............#'))
-map.append(list('#......##......#'))
-map.append(list('#......##......#'))
-map.append(list('#..............#'))
-map.append(list('###............#'))
-map.append(list('##.............#'))
-map.append(list('#......####..###'))
-map.append(list('#......#.......#'))
-map.append(list('#......#.......#'))
-map.append(list('#..............#'))
-map.append(list('#......#########'))
-map.append(list('#..............#'))
-map.append(list('################'))
+# Have player select map level
+map_dict = {'Map One': map_one,
+            'Map Two': map_two,
+            'Map Three': map_three,
+            'Map Four': map_four,
+            'Map Five': map_five}
+map = map_select(map_dict)
 
+# Setting Player start position and processing map
+found_p = False
+for row, list in enumerate(map):
+    for col, value in enumerate(list):
+        if value == 'p':
+            found_p = True
+            player_x = float(col) + 0.5
+            player_y = float(row) + 0.5
+            map[row][col] = '.'
+
+
+# Initiat time variables
 tp1 = time.perf_counter()
 tp2 = time.perf_counter()
 
@@ -56,7 +60,7 @@ while 1:
     elapsed_time = elapsed_time
 
     # exits game loop
-    if keyboard.is_pressed('q'):
+    if keyboard.is_pressed('Q'):
         sys.exit()
 
     # Handle CCW Rotation
@@ -140,7 +144,7 @@ while 1:
                             # Angle of corner to eye
                             vy = float(test_y) + ty - player_y
                             vx = float(test_x) + tx - player_x
-                            d = sqrt(vx*vx + vy*vy)
+                            d = math.sqrt(vx*vx + vy*vy)
                             dot = (eye_x * vx / d) + (eye_y * vy / d)
                             p.append((d, dot))
                     
@@ -204,7 +208,7 @@ while 1:
 
             screen[ny + 1][nx] = map[ny][nx]
             
-    screen[int(player_y)+1][int(player_x)] = 'P'
+    screen[int(player_y)+1][int(player_x)] = 'p'
 
     # Display Frame (problem with the \0 in python 3.9. empty string also works. null termination only needed for c++ version)
     screen[screen_height - 1][screen_width - 1] = ''
