@@ -4,17 +4,16 @@ import math
 import time
 import keyboard
 import curses
+import numpy as np
 
 from maps.Map_One import map_one
 from maps.Map_Two import map_two
 from maps.Map_Three import map_three
 from maps.Map_Four import map_four
 from maps.Map_Five import map_five
-from functions.Map_Select import map_select
 from functions.Command_Line_Font import command_line_font
 
 class Game():
-
     # Have player select map level
     map_dict = {'Map One': map_one,
                 'Map Two': map_two,
@@ -50,7 +49,15 @@ class Game():
         self.screen = [[0 for x in range(self.screen_width)] for y in range(self.screen_height)]
         os.system(f"mode con: cols={self.screen_width} lines={self.screen_height}")
 
-        self.map = map_select(self.map_dict)
+        # Initiate with map_one
+        self.update_map(map_one)
+
+        # Initiat time variables
+        self.tp1 = time.perf_counter()
+        self.tp2 = time.perf_counter()
+    
+    def update_map(self, new_map):
+        self.map = new_map
 
         # Setting Player start position and processing map
         for row, list in enumerate(self.map):
@@ -60,9 +67,7 @@ class Game():
                     self.player_y = float(row) + 0.5
                     self.map[row][col] = '.'
 
-        # Initiat time variables
-        self.tp1 = time.perf_counter()
-        self.tp2 = time.perf_counter()
+        self.player_a = 0.0
 
     def on_user_update(self):
         # We'll need time differential per frame to calculate modification
@@ -78,6 +83,21 @@ class Game():
             # Changing back to default font size
             command_line_font(16)
             sys.exit()
+
+        if keyboard.is_pressed('1'):
+            self.update_map(map_one)
+        
+        if keyboard.is_pressed('2'):
+            self.update_map(map_two)
+
+        if keyboard.is_pressed('3'):
+            self.update_map(map_three)
+
+        if keyboard.is_pressed('4'):
+            self.update_map(map_four)
+
+        if keyboard.is_pressed('5'):
+            self.update_map(map_five)
 
         # Handle CCW Rotation
         if keyboard.is_pressed('A'):
@@ -110,7 +130,25 @@ class Game():
                 self.player_y += math.cos(self.player_a) * self.speed * elapsed_time
 
         # Handle leftward movement & collision
-        # if keyboard. I left here 
+        if keyboard.is_pressed('Q'):
+
+            self.player_x -= math.sin(self.player_a + 1.5) * self.speed * elapsed_time
+            self.player_y -= math.cos(self.player_a + 1.5) * self.speed * elapsed_time
+            if self.map[int(self.player_y)][int(self.player_x)] == '#':
+
+                self.player_x += math.sin(self.player_a + 1.5) * self.speed * elapsed_time
+                self.player_y += math.cos(self.player_a + 1.5) * self.speed * elapsed_time
+
+        # Handle rightward movement & collision
+        if keyboard.is_pressed('E'):
+
+            self.player_x -= math.sin(self.player_a - 1.5) * self.speed * elapsed_time
+            self.player_y -= math.cos(self.player_a - 1.5) * self.speed * elapsed_time
+            if self.map[int(self.player_y)][int(self.player_x)] == '#':
+
+                self.player_x += math.sin(self.player_a - 1.5) * self.speed * elapsed_time
+                self.player_y += math.cos(self.player_a - 1.5) * self.speed * elapsed_time
+
 
         for x in range(0, self.screen_width):
 
@@ -237,6 +275,29 @@ class Game():
 
 # Initiate game loop
 game = Game()
+
+print('')
+print('Controls:')
+print('')
+print('Forward:     W')
+print('Backward:    S')
+print('Turn Left:   A')
+print('Turn Right:  D')
+print('')
+print('Move Left:   Q')
+print('Move Right:  E')
+print('')
+print('There are five maps to explore.')
+print('To change maps at any time press the following numbers.')
+print('')
+print('Map One:     1')
+print('Map Two:     2')
+print('Map Three:   3')
+print('Map Four:    4')
+print('Map Five:    5')
+print('')
+input('Press the Enter to continue...')
+
 game.on_user_create()
 
 # Command Line Formatting
