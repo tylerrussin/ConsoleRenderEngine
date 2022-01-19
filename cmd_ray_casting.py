@@ -12,208 +12,228 @@ from maps.Map_Four import map_four
 from maps.Map_Five import map_five
 from functions.Map_Select import map_select
 
-screen_width = 120          # Console Screen Size X (columns)
-screen_height = 40          # Console Screen Size Y (rows)
-map_height = 16
-map_width = 16
+class Game():
 
-player_a = 0.0              # Player Start Rotation
-fov = 3.14159 / 4.0        # Field of View
-depth = 16.0               # Maximum rendering distance
-speed = 5.0                # Walking Speed
-
-# Create Screen Buffer
-screen = [[0 for x in range(screen_width)] for y in range(screen_height)]
-os.system(f"mode con: cols={screen_width} lines={screen_height}")
-
-# Have player select map level
-map_dict = {'Map One': map_one,
-            'Map Two': map_two,
-            'Map Three': map_three,
-            'Map Four': map_four,
-            'Map Five': map_five}
-map = map_select(map_dict)
-
-# Setting Player start position and processing map
-found_p = False
-for row, list in enumerate(map):
-    for col, value in enumerate(list):
-        if value == 'p':
-            found_p = True
-            player_x = float(col) + 0.5
-            player_y = float(row) + 0.5
-            map[row][col] = '.'
+    # Have player select map level
+    map_dict = {'Map One': map_one,
+                'Map Two': map_two,
+                'Map Three': map_three,
+                'Map Four': map_four,
+                'Map Five': map_five}
 
 
-# Initiat time variables
-tp1 = time.perf_counter()
-tp2 = time.perf_counter()
+    def __init__(self):
+        self.screen_width = 120         # Console Screen Size X (columns)
+        self.screen_height = 40         # Console Screen Size Y (rows)
 
-while 1:
+        self.map_height = 16
+        self.map_width = 16
 
-    # We'll need time differential per frame to calculate modification
-    # to movement speeds, to ensure consistant movement, as ray-tracing
-    # is non-deterministic
-    tp2 = time.perf_counter()
-    elapsed_time = tp2 - tp1
-    tp1 = tp2
-    elapsed_time = elapsed_time
+        self.player_x = None
+        self.player_y = None
+        self.player_a = 0.0             # Player Start Rotation
 
-    # exits game loop
-    if keyboard.is_pressed('Q'):
-        sys.exit()
+        self.fov = 3.14159 / 4.0        # Field of View
+        self.depth = 16.0               # Maximum rendering distance
+        self.speed = 5.0                # Walking Speed
 
-    # Handle CCW Rotation
-    if keyboard.is_pressed('A'):
+        self.screen = None
 
-        player_a -= (speed * 0.75) * elapsed_time
+        self.tp1 = None
+        self.tp2 = None
 
-    # Handle CW Rotation
-    if keyboard.is_pressed('D'):
+        self.map = None
 
-        player_a += (speed * 0.75) * elapsed_time
+    def on_user_create(self):
+        # Create Screen Buffer
+        self.screen = [[0 for x in range(self.screen_width)] for y in range(self.screen_height)]
+        os.system(f"mode con: cols={self.screen_width} lines={self.screen_height}")
 
-    # Handle Forwards movement & collision
-    if keyboard.is_pressed('W'):
+        self.map = map_select(self.map_dict)
 
-        player_x += math.sin(player_a) * speed * elapsed_time
-        player_y += math.cos(player_a) * speed * elapsed_time
-        if map[int(player_y)][int(player_x)] == '#':
+        # Setting Player start position and processing map
+        for row, list in enumerate(self.map):
+            for col, value in enumerate(list):
+                if value == 'p':
+                    self.player_x = float(col) + 0.5
+                    self.player_y = float(row) + 0.5
+                    self.map[row][col] = '.'
 
-            player_x -= math.sin(player_a) * speed * elapsed_time
-            player_y -= math.cos(player_a) * speed * elapsed_time
+        # Initiat time variables
+        self.tp1 = time.perf_counter()
+        self.tp2 = time.perf_counter()
 
-    # Handle backwards movement & collision
-    if keyboard.is_pressed('S'):
+    def on_user_update(self):
+         # We'll need time differential per frame to calculate modification
+        # to movement speeds, to ensure consistant movement, as ray-tracing
+        # is non-deterministic
+        self.tp2 = time.perf_counter()
+        elapsed_time = self.tp2 - self.tp1
+        self.tp1 = self.tp2
+        elapsed_time = elapsed_time
 
-        player_x -= math.sin(player_a) * speed * elapsed_time
-        player_y -= math.cos(player_a) * speed * elapsed_time
-        if map[int(player_y)][int(player_x)] == '#':
+        # exits game loop
+        if keyboard.is_pressed('Q'):
+            sys.exit()
 
-            player_x += math.sin(player_a) * speed * elapsed_time
-            player_y += math.cos(player_a) * speed * elapsed_time
+        # Handle CCW Rotation
+        if keyboard.is_pressed('A'):
 
-    for x in range(0, screen_width):
+            self.player_a -= (self.speed * 0.75) * elapsed_time
 
-        # For each column, calculate the projected ray angle into world space
-        ray_angle = (player_a - fov/2.0) + (float(x) / float(screen_width)) * fov
+        # Handle CW Rotation
+        if keyboard.is_pressed('D'):
 
-        # Find distance to wall
-        step_size = 0.1         # Increment size for ray casting, decrease to increase
-        distance_to_wall = 0     #                                      resolution
+            self.player_a += (self.speed * 0.75) * elapsed_time
 
-        hit_wall = False       # Set when ray hits wall block
-        boundary = False      # Set when ray hits boundary between two wall blocks
+        # Handle Forwards movement & collision
+        if keyboard.is_pressed('W'):
 
-        eye_x = math.sin(ray_angle) # Unit vector for ray in player space
-        eye_y = math.cos(ray_angle)
+            self.player_x += math.sin(self.player_a) * self.speed * elapsed_time
+            self.player_y += math.cos(self.player_a) * self.speed * elapsed_time
+            if self.map[int(self.player_y)][int(self.player_x)] == '#':
 
-        # Incrementally cast ray from player, along ray angle, testing for 
-	    # intersection with a block
-        while hit_wall == False and distance_to_wall < depth:
+                self.player_x -= math.sin(self.player_a) * self.speed * elapsed_time
+                self.player_y -= math.cos(self.player_a) * self.speed * elapsed_time
 
-            distance_to_wall += step_size
-            test_x = int(player_x + eye_x * distance_to_wall)
-            test_y = int(player_y + eye_y * distance_to_wall)
+        # Handle backwards movement & collision
+        if keyboard.is_pressed('S'):
 
-            # Test if ray is out of bounds
-            if test_x < 0 or test_x >= map_width or test_y < 0 or test_y >= map_height:
+            self.player_x -= math.sin(self.player_a) * self.speed * elapsed_time
+            self.player_y -= math.cos(self.player_a) * self.speed * elapsed_time
+            if self.map[int(self.player_y)][int(self.player_x)] == '#':
 
-                hit_wall = True         # Just set distance to maximum depth
-                distance_to_wall = depth
+                self.player_x += math.sin(self.player_a) * self.speed * elapsed_time
+                self.player_y += math.cos(self.player_a) * self.speed * elapsed_time
 
-            else:
+        for x in range(0, self.screen_width):
 
-                # Ray is inbounds so test to see if the ray cell is a wall block
-                if map[test_y][test_x] == '#':
+            # For each column, calculate the projected ray angle into world space
+            ray_angle = (self.player_a - self.fov/2.0) + (float(x) / float(self.screen_width)) * self.fov
 
-                    # Ray has hit wall
-                    hit_wall = True
+            # Find distance to wall
+            step_size = 0.1         # Increment size for ray casting, decrease to increase
+            distance_to_wall = 0     #                                      resolution
 
-                    # To highlight tile boundaries, cast a ray from each corner
-                    # of the tile, to the player. The more coincident this ray
-                    # is to the rendering ray, the closer we are to a tile 
-                    # boundary, which we'll shade to add detail to the walls
-                    p = []
+            hit_wall = False       # Set when ray hits wall block
+            boundary = False      # Set when ray hits boundary between two wall blocks
 
-                    # Test each corner of hit tile, storing the distance from
-				    # the player, and the calculated dot product of the two rays
-                    for tx in range(0,2):
-                        for ty in range(0,2):
+            eye_x = math.sin(ray_angle) # Unit vector for ray in player space
+            eye_y = math.cos(ray_angle)
 
-                            # Angle of corner to eye
-                            vy = float(test_y) + ty - player_y
-                            vx = float(test_x) + tx - player_x
-                            d = math.sqrt(vx*vx + vy*vy)
-                            dot = (eye_x * vx / d) + (eye_y * vy / d)
-                            p.append((d, dot))
-                    
-                    # Sort Pairs from closest to farthest
-                    p.sort(key=lambda x: x[0])
+            # Incrementally cast ray from player, along ray angle, testing for 
+            # intersection with a block
+            while hit_wall == False and distance_to_wall < self.depth:
 
-                    # First two/three are closest (we will never see all four)
-                    bound = 0.01
-                    if math.acos(p[0][1]) < bound: boundary = True
-                    if math.acos(p[1][1]) < bound: boundary = True
-                    if math.acos(p[2][1]) < bound: boundary = True
+                distance_to_wall += step_size
+                test_x = int(self.player_x + eye_x * distance_to_wall)
+                test_y = int(self.player_y + eye_y * distance_to_wall)
 
+                # Test if ray is out of bounds
+                if test_x < 0 or test_x >= self.map_width or test_y < 0 or test_y >= self.map_height:
 
+                    hit_wall = True         # Just set distance to maximum depth
+                    distance_to_wall = self.depth
 
+                else:
 
-        # Calculate distance to ceiling and floor
-        ceiling = float(screen_height/2.0) - screen_height / float(distance_to_wall)
-        floor = screen_height - ceiling
+                    # Ray is inbounds so test to see if the ray cell is a wall block
+                    if self.map[test_y][test_x] == '#':
 
-        # Shader walls based on distance
-        shade = ' '
-        if distance_to_wall <= depth / 4.0:         shade = u'\u2588'     # Very Close
-        elif distance_to_wall < depth / 3.0:        shade = u'\u2593'
-        elif distance_to_wall < depth / 2.0:        shade = u'\u2592'
-        elif distance_to_wall < depth:              shade = u'\u2591'
-        else:                                       shade = ' '        # Too far away
+                        # Ray has hit wall
+                        hit_wall = True
 
-        if boundary:       shade = ' ' # Black it out
+                        # To highlight tile boundaries, cast a ray from each corner
+                        # of the tile, to the player. The more coincident this ray
+                        # is to the rendering ray, the closer we are to a tile 
+                        # boundary, which we'll shade to add detail to the walls
+                        p = []
 
-        for y in range(0, screen_height):
+                        # Test each corner of hit tile, storing the distance from
+                        # the player, and the calculated dot product of the two rays
+                        for tx in range(0,2):
+                            for ty in range(0,2):
 
-            # Each Row
-            if y < ceiling:
-                screen[y][x] = ' '
-            elif y > ceiling and y <= floor:
-                screen[y][x] = shade
-            else: # Floor
+                                # Angle of corner to eye
+                                vy = float(test_y) + ty - self.player_y
+                                vx = float(test_x) + tx - self.player_x
+                                d = math.sqrt(vx*vx + vy*vy)
+                                dot = (eye_x * vx / d) + (eye_y * vy / d)
+                                p.append((d, dot))
+                        
+                        # Sort Pairs from closest to farthest
+                        p.sort(key=lambda x: x[0])
 
-                # Shade floor based on distance
-                b = 1.0 - ((float(y) - screen_height/2.0) / (float(screen_height) / 2.0))
-                if b < 0.25:        shade_2 = '#'
-                elif b < 0.5:       shade_2 = 'x'
-                elif b < 0.75:      shade_2 = '.'
-                elif b < 0.9:       shade_2 = '-'
-                else:               shade_2 = " "
-                screen[y][x] = shade_2
+                        # First two/three are closest (we will never see all four)
+                        bound = 0.01
+                        if math.acos(p[0][1]) < bound: boundary = True
+                        if math.acos(p[1][1]) < bound: boundary = True
+                        if math.acos(p[2][1]) < bound: boundary = True
 
 
 
-    # Display Stats
-    view = curses.initscr()
-    curses.curs_set(0)
-    stats = f'X={"%.2f" % player_x}, Y={"%.2f" % player_y}, A={"%.2f" % player_a}, FPS={"%.2f" % (1.0 / elapsed_time)}'
-    stats_window = curses.newwin(1, len(stats) + 1, 0, 0)
-    stats_window.addstr(0, 0, stats)
-    stats_window.refresh()
 
-    # Display Map
-    for nx in range(0, map_width):
-        for ny in range(0, map_width):
+            # Calculate distance to ceiling and floor
+            ceiling = float(self.screen_height/2.0) - self.screen_height / float(distance_to_wall)
+            floor = self.screen_height - ceiling
 
-            screen[ny + 1][nx] = map[ny][nx]
-            
-    screen[int(player_y)+1][int(player_x)] = 'p'
+            # Shader walls based on distance
+            shade = ' '
+            if distance_to_wall <= self.depth / 4.0:         shade = u'\u2588'     # Very Close
+            elif distance_to_wall < self.depth / 3.0:        shade = u'\u2593'
+            elif distance_to_wall < self.depth / 2.0:        shade = u'\u2592'
+            elif distance_to_wall < self.depth:              shade = u'\u2591'
+            else:                                       shade = ' '        # Too far away
 
-    # Display Frame (problem with the \0 in python 3.9. empty string also works. null termination only needed for c++ version)
-    screen[screen_height - 1][screen_width - 1] = ''
-    view.addstr(0, 0, ''.join(ele for sub in screen for ele in sub))
-    view.refresh()
-    
+            if boundary:       shade = ' ' # Black it out
+
+            for y in range(0, self.screen_height):
+
+                # Each Row
+                if y < ceiling:
+                    self.screen[y][x] = ' '
+                elif y > ceiling and y <= floor:
+                    self.screen[y][x] = shade
+                else: # Floor
+
+                    # Shade floor based on distance
+                    b = 1.0 - ((float(y) - self.screen_height/2.0) / (float(self.screen_height) / 2.0))
+                    if b < 0.25:        shade_2 = '#'
+                    elif b < 0.5:       shade_2 = 'x'
+                    elif b < 0.75:      shade_2 = '.'
+                    elif b < 0.9:       shade_2 = '-'
+                    else:               shade_2 = " "
+                    self.screen[y][x] = shade_2
+
+
+
+        # Display Stats
+        view = curses.initscr()
+        curses.curs_set(0)
+        stats = f'X={"%.2f" % self.player_x}, Y={"%.2f" % self.player_y}, A={"%.2f" % self.player_a}, FPS={"%.2f" % (1.0 / elapsed_time)}'
+        stats_window = curses.newwin(1, len(stats) + 1, 0, 0)
+        stats_window.addstr(0, 0, stats)
+        stats_window.refresh()
+
+        # Display Map
+        for nx in range(0, self.map_width):
+            for ny in range(0, self.map_width):
+
+                self.screen[ny + 1][nx] = self.map[ny][nx]
+                
+        self.screen[int(self.player_y)+1][int(self.player_x)] = 'p'
+
+        # Display Frame (problem with the \0 in python 3.9. empty string also works. null termination only needed for c++ version)
+        self.screen[self.screen_height - 1][self.screen_width - 1] = ''
+        view.addstr(0, 0, ''.join(ele for sub in self.screen for ele in sub))
+        view.refresh()
+        
+
+# Initiate game loop
+game = Game()
+game.on_user_create()
+while True:
+    game.on_user_update()    
+
 
 # That's It!! - Tyler
