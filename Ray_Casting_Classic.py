@@ -277,40 +277,43 @@ class Game():
         self.view.addstr(0, 0, ''.join(ele for sub in self.screen for ele in sub))
         self.view.refresh()
         
+if __name__ == '__main__':
 
-# Initiate game loop
-game = Game()
+    # Initiate game loop
+    game = Game()
 
-# Defining user controlls
-print('')
-print('Controls:')
-print('')
-print('Forward:     W')
-print('Backward:    S')
-print('Turn Left:   A')
-print('Turn Right:  D')
-print('')
-print('Move Left:   Q')
-print('Move Right:  E')
-print('')
-print('There are five maps to explore.')
-print('To change maps at any time press the following numbers.')
-print('')
-print('Map One:     1')
-print('Map Two:     2')
-print('Map Three:   3')
-print('Map Four:    4')
-print('Map Five:    5')
-print('')
-input('Press the Enter to continue...')
+    # Defining user controlls
+    print('')
+    print('Controls:')
+    print('')
+    print('Forward:     W')
+    print('Backward:    S')
+    print('Turn Left:   A')
+    print('Turn Right:  D')
+    print('')
+    print('Move Left:   Q')
+    print('Move Right:  E')
+    print('')
+    print('Ouit:        P')
+    print('')
+    print('There are five maps to explore.')
+    print('To change maps at any time press the following numbers.')
+    print('')
+    print('Map One:     1')
+    print('Map Two:     2')
+    print('Map Three:   3')
+    print('Map Four:    4')
+    print('Map Five:    5')
+    print('')
+    input('Press the Enter to continue...')
 
-game.on_user_create()
+    game.on_user_create()
 
-# Command Line Formatting
-command_line_font(16)
+    # Command Line Formatting
+    command_line_font(16)
 
-while True:
-    
-    game.on_user_update()
+    while True:
+        
+        game.on_user_update()
 
-# That's It!! - Tyler
+    # That's It!! - Tyler

@@ -5,15 +5,18 @@ import time
 import keyboard
 import curses
 
+from classes.Sprite_Class import Sprite
+from functions.Command_Line_Font import command_line_font
 from maps.Map_One import map_one
 from maps.Map_Two import map_two
 from maps.Map_Three import map_three
 from maps.Map_Four import map_four
 from maps.Map_Five import map_five
-from functions.Command_Line_Font import command_line_font
-from sprites.Wall_Sprite import Wall_sprite
+from sprites.Wall_Sprite import matrix_glyph
+from sprites.Wall_Sprite import matrix_color
 
 class Game():
+
     # Have player select map level
     map_dict = {'Map One': map_one,
                 'Map Two': map_two,
@@ -21,13 +24,11 @@ class Game():
                 'Map Four': map_four,
                 'Map Five': map_five}
 
-
     def __init__(self):
         self.screen_width = 320         # Console Screen Size X (columns)
-        self.screen_height = 107         # Console Screen Size Y (rows)
-
-        self.map_height = 16
-        self.map_width = 16
+        self.screen_height = 107        # Console Screen Size Y (rows)
+        self.map_height = None
+        self.map_width = None
 
         self.player_x = None
         self.player_y = None
@@ -38,17 +39,14 @@ class Game():
         self.speed = 5.0                # Walking Speed
 
         self.screen = None
-
         self.tp1 = None
         self.tp2 = None
-
         self.map = None
-
         self.view = None
-
-        self.wall = Wall_sprite()
+        self.wall = Sprite(matrix_glyph, matrix_color) # Initialize Sprite
 
     def on_user_create(self):
+
         # Create Screen Buffer
         self.screen = [[0 for x in range(self.screen_width)] for y in range(self.screen_height)]
         os.system(f"mode con: cols={self.screen_width} lines={self.screen_height}")
@@ -62,20 +60,19 @@ class Game():
         curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_RED)
         curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
-        # Initialize sprite
-        self.wall.make_matrix()
-
-
-        # Initiate with map_one
+        # Initiate with map_six
         self.update_map(map_one)
+
+        self.map_height = len(self.map)
+        self.map_width = len(self.map[0])
 
         # Initiat time variables
         self.tp1 = time.perf_counter()
         self.tp2 = time.perf_counter()
     
     def update_map(self, new_map):
-        self.map = new_map
 
+        self.map = new_map
         # Setting Player start position and processing map
         for row, list in enumerate(self.map):
             for col, value in enumerate(list):
@@ -87,6 +84,7 @@ class Game():
         self.player_a = 0.0
 
     def on_user_update(self):
+
         # We'll need time differential per frame to calculate modification
         # to movement speeds, to ensure consistant movement, as ray-tracing
         # is non-deterministic
@@ -234,7 +232,6 @@ class Game():
             ceiling = float(self.screen_height/2.0) - self.screen_height / float(distance_to_wall)
             floor = self.screen_height - ceiling
 
-
             for y in range(0, self.screen_height):
 
                 # Each Row
@@ -244,64 +241,69 @@ class Game():
 
                 elif y > ceiling and y <= floor: # Drawing Wall
 
+                    if distance_to_wall < self.depth:
 
-                    sample_y = (y - ceiling) / (floor - ceiling)
-                    glyph = self.wall.sample_glyph(sample_x, sample_y)
-                    color = self.wall.sample_color(sample_x, sample_y)
+                        sample_y = (y - ceiling) / (floor - ceiling)
+                        glyph = self.wall.sample_glyph(sample_x, sample_y)
+                        color = self.wall.sample_color(sample_x, sample_y)
 
-                    self.screen[y][x] = glyph
-                    self.screen[self.screen_height - 1][self.screen_width - 1] = ''
-                    if color == 'R':
-                        self.view.addstr(y, x, str(self.screen[y][x]), curses.color_pair(2))
+                        self.screen[y][x] = glyph
+                        self.screen[self.screen_height - 1][self.screen_width - 1] = ''
+                        if color == 'R':
+                            self.view.addstr(y, x, str(self.screen[y][x]), curses.color_pair(2))
+                        else:
+                            self.view.addstr(y, x, str(self.screen[y][x]), curses.color_pair(3))
+                    
                     else:
-                        self.view.addstr(y, x, str(self.screen[y][x]), curses.color_pair(3))
+                        self.view.addstr(y, x, ' ') # too far don't render
 
 
                 else: # Floor
+
                     # Shading in as dark green pixle
                     if x == self.screen_width - 1 and y == self.screen_height -1:
                         self.view.addstr(y, x, '')
                     else:
                         self.view.addstr(y, x, ' ', curses.color_pair(1))
 
-
-
         # Refresh Screen
         self.view.refresh()
         
+if __name__ == '__main__':
 
-# Initiate game loop
-game = Game()
+    # Initiate game loop
+    game = Game()
 
-# Defining user controlls
-print('')
-print('Controls:')
-print('')
-print('Forward:     W')
-print('Backward:    S')
-print('Turn Left:   A')
-print('Turn Right:  D')
-print('')
-print('Move Left:   Q')
-print('Move Right:  E')
-print('')
-print('There are five maps to explore.')
-print('To change maps at any time press the following numbers.')
-print('')
-print('Map One:     1')
-print('Map Two:     2')
-print('Map Three:   3')
-print('Map Four:    4')
-print('Map Five:    5')
-print('')
-input('Press the Enter to continue...')
+    # Defining user controlls
+    print('')
+    print('Controls:')
+    print('')
+    print('Forward:     W')
+    print('Backward:    S')
+    print('Turn Left:   A')
+    print('Turn Right:  D')
+    print('')
+    print('Move Left:   Q')
+    print('Move Right:  E')
+    print('')
+    print('Ouit:        P')
+    print('')
+    print('There are five maps to explore.')
+    print('To change maps at any time press the following numbers.')
+    print('')
+    print('Map One:     1')
+    print('Map Two:     2')
+    print('Map Three:   3')
+    print('Map Four:    4')
+    print('Map Five:    5')
+    print('')
+    input('Press the Enter to continue...')
 
-# Command Line Formatting
-command_line_font(4)
-game.on_user_create()
+    # Command Line Formatting
+    command_line_font(4)
+    game.on_user_create()
 
-while True:
-    
-    game.on_user_update()
+    while True:
+        game.on_user_update()
 
-# That's It!! - Tyler
+    # That's It!! - Tyler
