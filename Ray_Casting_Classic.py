@@ -4,7 +4,6 @@ import math
 import time
 import keyboard
 import curses
-import numpy as np
 
 from maps.Map_One import map_one
 from maps.Map_Two import map_two
@@ -44,10 +43,16 @@ class Game():
 
         self.map = None
 
+        self.view = None
+
     def on_user_create(self):
         # Create Screen Buffer
         self.screen = [[0 for x in range(self.screen_width)] for y in range(self.screen_height)]
         os.system(f"mode con: cols={self.screen_width} lines={self.screen_height}")
+
+        # Initiate Curses
+        self.view = curses.initscr()
+        curses.curs_set(0)
 
         # Initiate with map_one
         self.update_map(map_one)
@@ -81,6 +86,8 @@ class Game():
         # exits game loop
         if keyboard.is_pressed('P'):
             # Changing back to default font size
+            curses.endwin()
+            os.system(f"mode con: cols={120} lines={40}")
             command_line_font(16)
             sys.exit()
 
@@ -252,8 +259,6 @@ class Game():
 
 
         # Display Stats
-        view = curses.initscr()
-        curses.curs_set(0)
         stats = f'X={"%.2f" % self.player_x}, Y={"%.2f" % self.player_y}, A={"%.2f" % self.player_a}, FPS={"%.2f" % (1.0 / elapsed_time)}'
         stats_window = curses.newwin(1, len(stats) + 1, 0, 0)
         stats_window.addstr(0, 0, stats)
@@ -269,13 +274,14 @@ class Game():
 
         # Display Frame (problem with the \0 in python 3.9. empty string also works. null termination only needed for c++ version)
         self.screen[self.screen_height - 1][self.screen_width - 1] = ''
-        view.addstr(0, 0, ''.join(ele for sub in self.screen for ele in sub))
-        view.refresh()
+        self.view.addstr(0, 0, ''.join(ele for sub in self.screen for ele in sub))
+        self.view.refresh()
         
 
 # Initiate game loop
 game = Game()
 
+# Defining user controlls
 print('')
 print('Controls:')
 print('')
