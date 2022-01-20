@@ -11,6 +11,7 @@ from maps.Map_Three import map_three
 from maps.Map_Four import map_four
 from maps.Map_Five import map_five
 from functions.Command_Line_Font import command_line_font
+from sprites.Wall_Sprite import Wall_sprite
 
 class Game():
     # Have player select map level
@@ -45,6 +46,8 @@ class Game():
 
         self.view = None
 
+        self.wall = Wall_sprite()
+
     def on_user_create(self):
         # Create Screen Buffer
         self.screen = [[0 for x in range(self.screen_width)] for y in range(self.screen_height)]
@@ -58,6 +61,9 @@ class Game():
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)
         curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_RED)
         curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_WHITE)
+
+        # Initialize sprite
+        self.wall.make_matrix()
 
 
         # Initiate with map_one
@@ -175,7 +181,6 @@ class Game():
             distance_to_wall = 0     #                                      resolution
 
             hit_wall = False       # Set when ray hits wall block
-            boundary = False      # Set when ray hits boundary between two wall blocks
 
             eye_x = math.sin(ray_angle) # Unit vector for ray in player space
             eye_y = math.cos(ray_angle)
@@ -209,8 +214,8 @@ class Game():
                         block_mid_x =  test_x  + 0.5
                         block_mid_y = test_y + 0.5
 
-                        test_point_x = self.player_x + eye_x + distance_to_wall
-                        test_point_y = self.player_y + eye_y + distance_to_wall
+                        test_point_x = self.player_x + eye_x * distance_to_wall
+                        test_point_y = self.player_y + eye_y * distance_to_wall
 
                         test_angle = math.atan2((test_point_y - block_mid_y), (test_point_x - block_mid_x))
 
@@ -238,9 +243,19 @@ class Game():
                     self.view.addstr(y, x, ' ')
 
                 elif y > ceiling and y <= floor: # Drawing Wall
-                    self.screen[y][x] = ' '
+
+
+                    sample_y = (y - ceiling) / (floor - ceiling)
+                    glyph = self.wall.sample_glyph(sample_x, sample_y)
+                    color = self.wall.sample_color(sample_x, sample_y)
+
+                    self.screen[y][x] = glyph
                     self.screen[self.screen_height - 1][self.screen_width - 1] = ''
-                    self.view.addstr(y, x, str(self.screen[y][x]), curses.color_pair(2))
+                    if color == 'R':
+                        self.view.addstr(y, x, str(self.screen[y][x]), curses.color_pair(2))
+                    else:
+                        self.view.addstr(y, x, str(self.screen[y][x]), curses.color_pair(3))
+
 
                 else: # Floor
                     # Shading in as dark green pixle
