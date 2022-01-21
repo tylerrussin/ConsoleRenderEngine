@@ -235,7 +235,7 @@ class Game():
             index = index + 1
             y = int(y)
             x = int(float(x) * self.screen_width)
-            self.view.addstr(y, x, char)
+            self.view.addstr(y, x, ' ', curses.color_pair(self.shade_dict[char]))
 
         # self.view.addstr(0, 0, screen_string)
         self.view.refresh()
