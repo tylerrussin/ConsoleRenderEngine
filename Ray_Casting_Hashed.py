@@ -16,6 +16,7 @@ from maps.Map_Three import map_three
 from maps.Map_Four import map_four
 from maps.Map_Five import map_five
 from maps.Map_Six import map_six
+from maps.Map_Seven import map_seven 
 from sprites.Wall_Sprite import matrix_glyph
 from sprites.Wall_Sprite import matrix_color
 
@@ -59,7 +60,7 @@ class Game():
         curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_RED)
         curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
-        # Initiate with map_six
+        # Initiate with map
         self.update_map(map_six)
 
         self.map_height = len(self.map)
@@ -70,10 +71,10 @@ class Game():
         self.tp2 = time.perf_counter()
 
         # Checking if map file exists
-        if os.path.exists('Hashed_Maps/test_map.json'):
+        if os.path.exists('Hashed_Maps/map_seven.json'):
             print('map file exists')
             # Opening JSON file
-            f = open('Hashed_Maps/test_map.json')
+            f = open('Hashed_Maps/map_seven.json')
             
             # returns JSON object as
             # a dictionary
@@ -171,23 +172,23 @@ class Game():
         a_key = False
         if keyboard.is_pressed('A'):
             a_key = True
-            self.player_x -= math.sin(self.player_a + 1.5) * self.speed * elapsed_time
-            self.player_y -= math.cos(self.player_a + 1.5) * self.speed * elapsed_time
+            self.player_x -= math.sin(self.player_a + 1.57) * self.speed * elapsed_time
+            self.player_y -= math.cos(self.player_a + 1.57) * self.speed * elapsed_time
             if self.map[int(self.player_y)][int(self.player_x)] == '#':
 
-                self.player_x += math.sin(self.player_a + 1.5) * self.speed * elapsed_time
-                self.player_y += math.cos(self.player_a + 1.5) * self.speed * elapsed_time
+                self.player_x += math.sin(self.player_a + 1.57) * self.speed * elapsed_time
+                self.player_y += math.cos(self.player_a + 1.57) * self.speed * elapsed_time
 
         # Handle rightward movement & collision
         d_key = False
         if keyboard.is_pressed('D'):
             d_key = True
-            self.player_x -= math.sin(self.player_a - 1.5) * self.speed * elapsed_time
-            self.player_y -= math.cos(self.player_a - 1.5) * self.speed * elapsed_time
+            self.player_x -= math.sin(self.player_a - 1.57) * self.speed * elapsed_time
+            self.player_y -= math.cos(self.player_a - 1.57) * self.speed * elapsed_time
             if self.map[int(self.player_y)][int(self.player_x)] == '#':
 
-                self.player_x += math.sin(self.player_a - 1.5) * self.speed * elapsed_time
-                self.player_y += math.cos(self.player_a - 1.5) * self.speed * elapsed_time
+                self.player_x += math.sin(self.player_a - 1.57) * self.speed * elapsed_time
+                self.player_y += math.cos(self.player_a - 1.57) * self.speed * elapsed_time
 
         screen_string = self.hashed_map.get("({}, {}, {})".format(round(self.player_a, 2), round(self.player_y, 1), round(self.player_x, 1)))
         try:
@@ -207,11 +208,11 @@ class Game():
                 self.player_x += math.sin(self.player_a) * self.speed * elapsed_time
                 self.player_y += math.cos(self.player_a) * self.speed * elapsed_time
             if a_key:
-                self.player_x += math.sin(self.player_a + 1.5) * self.speed * elapsed_time
-                self.player_y += math.cos(self.player_a + 1.5) * self.speed * elapsed_time
+                self.player_x += math.sin(self.player_a + 1.57) * self.speed * elapsed_time
+                self.player_y += math.cos(self.player_a + 1.57) * self.speed * elapsed_time
             if d_key:
-                self.player_x += math.sin(self.player_a - 1.5) * self.speed * elapsed_time
-                self.player_y += math.cos(self.player_a - 1.5) * self.speed * elapsed_time
+                self.player_x += math.sin(self.player_a - 1.57) * self.speed * elapsed_time
+                self.player_y += math.cos(self.player_a - 1.57) * self.speed * elapsed_time
 
             screen_string = self.hashed_map.get("({}, {}, {})".format(round(self.player_a, 2), round(self.player_y, 1), round(self.player_x, 1)))
             self.view.addstr(0, 0, screen_string)
@@ -333,7 +334,7 @@ class Game():
         self.hashed_map = hashed_map
 
         # Saving the hashed map as json file for future use
-        with open("Hashed_Maps/test_map.json", "w") as outfile:
+        with open("Hashed_Maps/map_seven.json", "w") as outfile:
             json.dump(hashed_map, outfile)
 
         

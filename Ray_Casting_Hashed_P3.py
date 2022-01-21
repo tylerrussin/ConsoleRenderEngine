@@ -16,12 +16,15 @@ from maps.Map_Three import map_three
 from maps.Map_Four import map_four
 from maps.Map_Five import map_five
 from maps.Map_Six import map_six
+from maps.Map_Seven import map_seven
+from maps.Map_Eight import map_eight
 from sprites.Wall_Sprite import matrix_glyph
 from sprites.Wall_Sprite import matrix_color
+from sprites.Wall_Sprite import color_to_glyph
 
 class Game():
 
-    shade_dict = {' ': 4,
+    shade_dict = {' ': 4,  # it is C for map eight!!!
                   'W': 3,
                   'R': 2,
                   'G': 1}
@@ -47,7 +50,7 @@ class Game():
         self.tp2 = None
         self.map = None
         self.view = None
-        self.wall = Sprite(matrix_glyph, matrix_color) # Initialize Sprite
+        self.wall = Sprite(matrix_glyph, matrix_color, color_to_glyph) # Initialize Sprite
 
         self.screen_string = None
 
@@ -67,8 +70,8 @@ class Game():
         curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_WHITE)
         curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_BLACK)
 
-        # Initiate with map_six
-        self.update_map(map_six)
+        # Initiate with map
+        self.update_map(map_seven)
 
         self.map_height = len(self.map)
         self.map_width = len(self.map[0])
@@ -78,10 +81,10 @@ class Game():
         self.tp2 = time.perf_counter()
 
         # Checking if map file exists
-        if os.path.exists('Hashed_Maps/test_map.json'):
+        if os.path.exists('classes/Hashed_Maps/map_seven.json'):
             print('map file exists')
             # Opening JSON file
-            f = open('Hashed_Maps/test_map.json')
+            f = open('classes/Hashed_Maps/map_seven.json')
             
             # returns JSON object as
             # a dictionary
@@ -126,6 +129,7 @@ class Game():
             curses.endwin()
             os.system(f"mode con: cols={120} lines={40}")
             command_line_font(16)
+            del self.hashed_map
             sys.exit()
 
 
@@ -197,6 +201,7 @@ class Game():
                 self.player_x += math.sin(self.player_a - 1.57) * self.speed * elapsed_time
                 self.player_y += math.cos(self.player_a - 1.57) * self.speed * elapsed_time
 
+        # Get current screen
         self.screen_string = self.hashed_map.get("({}, {}, {})".format(round(self.player_a, 2), round(self.player_y, 1), round(self.player_x, 1)))
         try:
 
@@ -237,7 +242,6 @@ class Game():
             x = int(float(x) * self.screen_width)
             self.view.addstr(y, x, ' ', curses.color_pair(self.shade_dict[char]))
 
-        # self.view.addstr(0, 0, screen_string)
         self.view.refresh()
 
         
@@ -254,7 +258,8 @@ class Game():
 
                     # If we are in a wall
                     if self.map[int(y_hash)][int(x_hash)] == '#':
-                        hashed_map.update({'({}, {}, {})'.format(round(radian_hash, 2), round(y_hash, 1), round(x_hash, 1)): ' '})
+                        # No need to was memory we will never be at this coord
+                        pass
                     else:
 
                         for x in range(0, self.screen_width):
@@ -356,7 +361,7 @@ class Game():
         self.hashed_map = hashed_map
 
         # Saving the hashed map as json file for future use
-        with open("Hashed_Maps/test_map.json", "w") as outfile:
+        with open("classes/Hashed_Maps/map_seven.json", "w") as outfile:
             json.dump(hashed_map, outfile)
 
         

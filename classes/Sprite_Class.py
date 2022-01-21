@@ -1,12 +1,11 @@
-import math
-
 class Sprite():
 
-    def __init__(self, matrix_glyph, matrix_color):
+    def __init__(self, matrix_glyph, matrix_color, color_to_glyph):
         self.matrix_glyph = matrix_glyph
         self.matrix_color = matrix_color
         self.width = len(matrix_glyph[0])
         self.height = len(matrix_glyph)
+        self.color_to_glyph = color_to_glyph
     
     def sample_glyph(self, x, y):
         x = str(x).split('.')
