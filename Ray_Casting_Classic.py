@@ -13,13 +13,6 @@ from maps.Map_Five import map_five
 from functions.Command_Line_Font import command_line_font
 
 class Game():
-    # Have player select map level
-    map_dict = {'Map One': map_one,
-                'Map Two': map_two,
-                'Map Three': map_three,
-                'Map Four': map_four,
-                'Map Five': map_five}
-
 
     def __init__(self):
         self.screen_width = 120         # Console Screen Size X (columns)

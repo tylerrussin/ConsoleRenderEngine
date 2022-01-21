@@ -17,13 +17,6 @@ from sprites.Wall_Sprite import matrix_color
 
 class Game():
 
-    # Have player select map level
-    map_dict = {'Map One': map_one,
-                'Map Two': map_two,
-                'Map Three': map_three,
-                'Map Four': map_four,
-                'Map Five': map_five}
-
     def __init__(self):
         self.screen_width = 320         # Console Screen Size X (columns)
         self.screen_height = 107        # Console Screen Size Y (rows)
@@ -81,7 +74,7 @@ class Game():
                     self.player_y = float(row) + 0.5
                     self.map[row][col] = '.'
 
-        self.player_a = 0.0
+        self.player_a = 0.00
 
     def on_user_update(self):
 
