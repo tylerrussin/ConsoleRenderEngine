@@ -1,0 +1,18 @@
+# Create Map of world space # = wall block, . = space,  p = player position facing south
+map_nine = []
+map_nine.append(list('################'))
+map_nine.append(list('#.#.....p......#'))
+map_nine.append(list('#.#............#'))
+map_nine.append(list('#.#............#'))
+map_nine.append(list('#.#............#'))
+map_nine.append(list('#..............#'))
+map_nine.append(list('#.#.....#....###'))
+map_nine.append(list('#.#.....#......#'))
+map_nine.append(list('#.#.....#....###'))
+map_nine.append(list('#.#.....#......#'))
+map_nine.append(list('#.##....#......#'))
+map_nine.append(list('#...#.......####'))
+map_nine.append(list('#.##...........#'))
+map_nine.append(list('#.#.........#..#'))
+map_nine.append(list('#...........#..#'))
+map_nine.append(list('################'))

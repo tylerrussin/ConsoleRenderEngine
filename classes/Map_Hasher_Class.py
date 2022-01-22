@@ -9,18 +9,8 @@ import math
 import json
 import numpy as np
 
-from maps.Map_One import map_one
-from maps.Map_Two import map_two
-from maps.Map_Three import map_three
-from maps.Map_Four import map_four
-from maps.Map_Five import map_five
-from maps.Map_Six import map_six
-from maps.Map_Seven import map_seven
-from maps.Map_Eight import map_eight
-
-from Sprite_Class import Sprite
-from sprites.Wall_Sprite import matrix_glyph
-from sprites.Wall_Sprite import matrix_color
+from classes.Sprite_Class import Sprite
+from sprites.Wall_Sprite import matrix
 from sprites.Wall_Sprite import color_to_glyph
 
 class Map_Hasher():
@@ -41,7 +31,7 @@ class Map_Hasher():
         self.fov = 3.14159 / 4.0                                                                  # Field of View
         self.depth = 16.0                                                                         # Maximum rendering distance
             
-        self.wall = Sprite(matrix_glyph, matrix_color, color_to_glyph)                            # Initialize Sprite
+        self.wall = Sprite(matrix, color_to_glyph)                                                # Initialize Sprite
 
 
     def update_map(self, new_map, map_name):
@@ -50,6 +40,7 @@ class Map_Hasher():
         self.map_height = len(self.map)
         self.map_width = len(self.map[0])
         self.map_path = 'Hashed_Maps/{}.json'.format(map_name)
+        
         # Setting Player start position and processing map
         for row, list in enumerate(self.map):
             for col, value in enumerate(list):
@@ -179,19 +170,4 @@ class Map_Hasher():
         del hashed_map
         sys.exit()
 
-        
-if __name__ == '__main__':
 
-    # Initiate Hash Class
-    screen_width = 320
-    screen_height = 107
-    step_size = 0.1
-    map_hashing = Map_Hasher(screen_width, screen_height, step_size)
-
-    # Initiate with map
-    map_hashing.update_map(map_eight, 'map_eight')
-
-    print('You are about to begin map hashing')
-    print(' ')
-    input('Press the Enter to continue...')
-    map_hashing.create_hashed_map()

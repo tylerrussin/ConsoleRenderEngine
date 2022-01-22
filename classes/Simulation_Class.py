@@ -20,16 +20,6 @@ from functions.Key_Press_W import key_press_w
 from functions.Key_Press_S import key_press_s
 from functions.Key_Press_Q import key_press_q
 from functions.Key_Press_E import key_press_e
-from maps.Map_One import map_one
-from maps.Map_Two import map_two
-from maps.Map_Three import map_three
-from maps.Map_Four import map_four
-from maps.Map_Five import map_five
-from maps.Map_Six import map_six
-from maps.Map_Seven import map_seven
-from maps.Map_Eight import map_eight
-from sprites import Wall_Sprite
-
 
 
 class Simulation():
@@ -82,20 +72,22 @@ class Simulation():
         self.elapsed_time = None
 
         self.simulation_type_dict = {'classic': self.run_classic,
-                                     'textured': self.run_textured}
+                                     'textured': self.run_textured,
+                                     'hashed': self.run_hashed}
+
 
     def on_user_create(self):
         '''Initializing the simulation: map loading, screen buffer, font size, curses instance, and time'''
         # Loading in hashed map
         if self.simulation_type == 'hashed':
-            self.textured == True
-
             # Checking if map file exists
             if os.path.exists(self.map_path):
                 print('Loading in map...')
                 f = open(self.map_path)
                 self.hashed_map_dict = json.load(f)
+                time.sleep(5) # Clearing the load
                 f.close()
+                time.sleep(5) # Clearing the load
     
             else:
                 # Map not at located at path
@@ -168,76 +160,6 @@ class Simulation():
         self.simulation_type_dict[self.simulation_type]()
 
     
-
-
-        # Get current screen
-        # if self.hashed_map:
-        # screen_string = self.hashed_map_dict.get("({}, {}, {})".format(round(self.player_a, 2), round(self.player_y, 1), round(self.player_x, 1)))
-        # # try:
-
-        # screen_list = [char for char in screen_string]
-        # index = 0
-        # for char in screen_list:
-        #     coord_str = str(index / self.screen_width)
-        #     coord_str = coord_str.split('.')
-        #     y, x = coord_str[0], '0.' + coord_str[1]
-        #     index = index + 1
-        #     y = int(y)
-        #     x = int(float(x) * self.screen_width)
-        #     self.view.addstr(y, x, ' ', curses.color_pair(self.shade_dict[char]))
-        # self.view.refresh()
-        # w_key = False
-        # s_key = False
-        # a_key = False
-        # d_key = False
-
-            # except:
-            #     # moved into non existing coord. move back to previous posistion
-            #     if w_key:
-            #         self.player_x -= math.sin(self.player_a) * self.speed * self.elapsed_time
-            #         self.player_y -= math.cos(self.player_a) * self.speed * self.elapsed_time
-            #     if s_key:
-            #         self.player_x += math.sin(self.player_a) * self.speed * self.elapsed_time
-            #         self.player_y += math.cos(self.player_a) * self.speed * self.elapsed_time
-            #     if a_key:
-            #         self.player_x += math.sin(self.player_a + 1.57) * self.speed * self.elapsed_time
-            #         self.player_y += math.cos(self.player_a + 1.57) * self.speed * self.elapsed_time
-            #     if d_key:
-            #         self.player_x += math.sin(self.player_a - 1.57) * self.speed * self.elapsed_time
-            #         self.player_y += math.cos(self.player_a - 1.57) * self.speed * self.elapsed_time
-
-            #     screen_string = self.hashed_map_dict.get("({}, {}, {})".format(round(self.player_a, 2), round(self.player_y, 1), round(self.player_x, 1)))
-            #     screen_list = [char for char in screen_string]
-            #     index = 0
-            #     for char in screen_list:
-            #         coord_str = str(index / self.screen_width)
-            #         coord_str = coord_str.split('.')
-            #         y, x = coord_str[0], '0.' + coord_str[1]
-            #         index = index + 1
-            #         y = int(y)
-            #         x = int(float(x) * self.screen_width)
-            #         self.view.addstr(y, x, ' ', curses.color_pair(self.shade_dict[char]))
-            #     self.view.refresh()
-
-        # elif self.textured:
-        #     self.calculate_screen()
-        #     self.screen[self.screen_height - 1][self.screen_width - 1] = ''
-        #     screen_string =  ''.join(ele for sub in self.screen for ele in sub)
-        #     screen_list = [char for char in screen_string]
-        #     index = 0
-        #     for char in screen_list:
-        #         coord_str = str(index / self.screen_width)
-        #         coord_str = coord_str.split('.')
-        #         y, x = coord_str[0], '0.' + coord_str[1]
-        #         index = index + 1
-        #         y = int(y)
-        #         x = int(float(x) * self.screen_width)
-        #         self.view.addstr(y, x, ' ', curses.color_pair(self.shade_dict[char]))
-        #     self.view.refresh()
-
-        # else: # classic
-
-
     def on_key_press(self, key_pressed):
         '''Routes to functions given which input key was pressed. Calls the key_pressed_dict'''
         self.player_a, self.player_y, self.player_x, self.player_radian_index = self.key_press_dict[key_pressed](self.player_a,
@@ -281,6 +203,25 @@ class Simulation():
 
         # Calculate Screen
         self.calculate_screen()
+        self.view.refresh()
+
+    def run_hashed(self):
+        '''Calling from a previously calculated hash for the current screen given player coordinates'''
+        
+        # Get current screen
+        screen_string = self.hashed_map_dict.get("({}, {}, {})".format(round(self.player_a, 2), round(self.player_y, 1), round(self.player_x, 1)))
+
+        # Prep Screen for shadding
+        screen_list = [char for char in screen_string]
+        index = 0
+        for char in screen_list:
+            coord_str = str(index / self.screen_width)
+            coord_str = coord_str.split('.')
+            y, x = coord_str[0], '0.' + coord_str[1]
+            index = index + 1
+            y = int(y)
+            x = int(float(x) * self.screen_width)
+            self.view.addstr(y, x, ' ', curses.color_pair(self.shade_dict[char]))   # Add pixle to screen
         self.view.refresh()
 
 
@@ -432,51 +373,3 @@ class Simulation():
                         else:
                             self.view.addstr(y, x, ' ', curses.color_pair(1))    # Shading Green
 
-
-if __name__ == '__main__':
-
-    # Initiate simpulation loop
-
-    # Classic
-    game = Simulation(screen_width = 120, 
-                      screen_height = 40,
-                      console_font_size= 16, 
-                      simulation_type = 'classic', 
-                      step_size = 0.1, 
-                      matrix_wall = Wall_Sprite.matrix, 
-                      color_to_glyph_wall = Wall_Sprite.color_to_glyph)
-
-    # Textured
-    # game = Simulation(screen_width = 320, 
-    #                 screen_height = 107,
-    #                 console_font_size= 4, 
-    #                 simulation_type = 'textured', 
-    #                 step_size = 0.1, 
-    #                 matrix_wall = Wall_Sprite.matrix, 
-    #                 color_to_glyph_wall = Wall_Sprite.color_to_glyph)
-
-    # Defining user controlls
-    print('')
-    print('Controls:')
-    print('')
-    print('Forward:     W')
-    print('Backward:    S')
-    print('Move Left:   A')
-    print('Move Right:  D')
-    print('')
-    print('Turn Left:   Q')
-    print('Turn Right:  E')
-    print('')
-    print('Ouit:        P')
-    print('')
-    print('')
-    input('Press the Enter to continue...')
-
-    # Initiate with map_six
-    game.update_map(map_seven, 'map_seven')
-    game.on_user_create()
-
-    while True:
-        game.on_user_update()
-
-    # That's It!! - Tyler
