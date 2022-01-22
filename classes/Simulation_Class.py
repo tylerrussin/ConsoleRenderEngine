@@ -12,8 +12,8 @@ import curses
 import json
 
 from classes.Sprite_Class import Sprite
-from functions.Command_Line_Font import command_line_font
 
+from functions.Command_Line_Font import command_line_font
 from functions.Key_Press_A import key_press_a
 from functions.Key_Press_D import key_press_d
 from functions.Key_Press_W import key_press_w
@@ -25,7 +25,6 @@ from maps.Map_Two import map_two
 from maps.Map_Three import map_three
 from maps.Map_Four import map_four
 from maps.Map_Five import map_five
-
 from maps.Map_Six import map_six
 from maps.Map_Seven import map_seven
 from maps.Map_Eight import map_eight
@@ -47,12 +46,13 @@ class Simulation():
                       'q': key_press_q,
                       'e': key_press_e}
 
-    def __init__(self, screen_width, screen_height, console_font_size, textured, hashed_map, step_size, matrix_wall, color_to_glyph_wall):
+    
+    def __init__(self, screen_width, screen_height, console_font_size, simulation_type, step_size, matrix_wall, color_to_glyph_wall):
+        
         self.screen_width = screen_width         # Console Screen Size X (columns)
         self.screen_height = screen_height        # Console Screen Size Y (rows)
         self.console_font_size = console_font_size
-        self.textured = textured
-        self.hashed_map = hashed_map
+        self.simulation_type = simulation_type  # classic, textured, hashed
         self.step_size = step_size
 
         self.map_height = None
@@ -74,72 +74,55 @@ class Simulation():
         self.depth = 16.0               # Maximum rendering distance
         self.speed = 5.0                # Walking Speed
         
-        self.tp1 = None
-        self.tp2 = None
-        
         self.wall = Sprite(matrix_wall, color_to_glyph_wall) # Initialize Sprite
         self.view = None
 
+        self.tp1 = None
+        self.tp2 = None
         self.elapsed_time = None
 
+        self.simulation_type_dict = {'classic': self.run_classic,
+                                     'textured': self.run_textured}
+
     def on_user_create(self):
-        # hashed maps only designed for textures
-        if self.hashed_map:
+        '''Initializing the simulation: map loading, screen buffer, font size, curses instance, and time'''
+        # Loading in hashed map
+        if self.simulation_type == 'hashed':
             self.textured == True
+
             # Checking if map file exists
             if os.path.exists(self.map_path):
                 print('Loading in map...')
-                # Opening JSON file
                 f = open(self.map_path)
-                
-                # returns JSON object as
-                # a dictionary
                 self.hashed_map_dict = json.load(f)
-                
-                # Closing file
                 f.close()
     
-        
             else:
-                # Have to create hashed map
+                # Map not at located at path
                 print('The hashed map specified does not exist...')
+
+        # Command Line Formatting (pixel size)
+        command_line_font(self.console_font_size)
 
         # Create Screen Buffer and enable color on os
         os.system(f"mode con: cols={self.screen_width} lines={self.screen_height}")
         os.system('color')
 
-        # Command Line Formatting (pixel size)
-        command_line_font(self.console_font_size)
-
         # Inializing Curses
         self.view = curses.initscr()
-        curses.curs_set(False)    # disables blinking curser
-        curses.start_color()      # enables color
-        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)
+        curses.curs_set(False)                                          # Disables blinking curser
+        curses.start_color()                                            # Enables color
+        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)     # Setting color pairs
         curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_RED)
         curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
-        # Initiat time variables
+        # Initiate time variables
         self.tp1 = time.perf_counter()
         self.tp2 = time.perf_counter()
 
 
-
-
-    def on_key_press(self, key_pressed):
-        self.player_a, self.player_y, self.player_x, self.player_radian_index = self.key_press_dict[key_pressed](self.player_a,
-                                                                                                                 self.player_y, 
-                                                                                                                 self.player_x, 
-                                                                                                                 self.player_radian_index, 
-                                                                                                                 self.hashed_map, 
-                                                                                                                 self.player_radians_list, 
-                                                                                                                 self.speed, 
-                                                                                                                 self.elapsed_time,
-                                                                                                                 self.map)
-
-    
     def update_map(self, new_map, map_name):
-
+        '''Loads in specified map for simulation'''
         self.map = new_map
         self.map_height = len(self.map)
         self.map_width = len(self.map[0])
@@ -155,9 +138,7 @@ class Simulation():
 
     def on_user_update(self):
 
-        # We'll need time differential per frame to calculate modification
-        # to movement speeds, to ensure consistant movement, as ray-tracing
-        # is non-deterministic
+        # Calculate time differential per frame
         self.tp2 = time.perf_counter()
         self.elapsed_time = self.tp2 - self.tp1
         self.tp1 = self.tp2
@@ -182,6 +163,9 @@ class Simulation():
             command_line_font(16)                           # Reset default font size
             del self.hashed_screen                          # Delete large memory object
             sys.exit()                                      # Exit Program
+
+
+        self.simulation_type_dict[self.simulation_type]()
 
     
 
@@ -252,14 +236,28 @@ class Simulation():
         #     self.view.refresh()
 
         # else: # classic
+
+
+    def on_key_press(self, key_pressed):
+        '''Routes to functions given which input key was pressed. Calls the key_pressed_dict'''
+        self.player_a, self.player_y, self.player_x, self.player_radian_index = self.key_press_dict[key_pressed](self.player_a,
+                                                                                                                 self.player_y, 
+                                                                                                                 self.player_x, 
+                                                                                                                 self.player_radian_index, 
+                                                                                                                 self.simulation_type, 
+                                                                                                                 self.player_radians_list, 
+                                                                                                                 self.speed, 
+                                                                                                                 self.elapsed_time,
+                                                                                                                 self.map)
+
+
+    def run_classic(self):
         self.calculate_screen()
         self.screen[self.screen_height - 1][self.screen_width - 1] = ''
 
         # Display Stats
         stats = f'X={"%.2f" % self.player_x}, Y={"%.2f" % self.player_y}, A={"%.2f" % self.player_a}, FPS={"%.2f" % (1.0 / self.elapsed_time)}'
-        stats_window = curses.newwin(1, len(stats) + 1, 0, 0)
-        stats_window.addstr(0, 0, stats)
-        stats_window.refresh()
+
 
         # Display Map
         for nx in range(0, self.map_width):
@@ -271,7 +269,26 @@ class Simulation():
         screen_string =  ''.join(ele for sub in self.screen for ele in sub)
 
         self.view.addstr(0, 0, screen_string)
+        self.view.addstr(0, 0, stats)
         self.view.refresh()
+
+    def run_textured(self):
+        self.calculate_screen()
+        self.screen[self.screen_height - 1][self.screen_width - 1] = ''
+        screen_string =  ''.join(ele for sub in self.screen for ele in sub)
+        screen_list = [char for char in screen_string]
+        index = 0
+        for char in screen_list:
+            coord_str = str(index / self.screen_width)
+            coord_str = coord_str.split('.')
+            y, x = coord_str[0], '0.' + coord_str[1]
+            index = index + 1
+            y = int(y)
+            x = int(float(x) * self.screen_width)
+            self.view.addstr(y, x, ' ', curses.color_pair(self.shade_dict[char]))
+        self.view.refresh()
+
+
 
 
 
@@ -315,7 +332,7 @@ class Simulation():
                         # Ray has hit wall
                         hit_wall = True
 
-                        if self.textured:
+                        if self.simulation_type == 'textured':
                             # Determine where on the wall the ray will hit. Break block boundry into 4 line segments
                             # When a wall is hit calculate the mid-point (0.5) since the wals are unit squares
                             block_mid_x =  test_x  + 0.5
@@ -370,7 +387,7 @@ class Simulation():
 
             for y in range(0, self.screen_height):
 
-                if self.textured:
+                if self.simulation_type == 'textured':
                     # Each Row
                     if y < ceiling:
                         # Shading in C for ceiling
@@ -423,15 +440,24 @@ class Simulation():
 if __name__ == '__main__':
 
     # Initiate simpulation loop
-    screen_width = 120
-    screen_height = 40
-    console_font_size = 16
-    textured = False
-    hashed_map = False
-    step_size = 0.1
-    matrix_wall = Wall_Sprite.matrix
-    color_to_glyph_wall = Wall_Sprite.color_to_glyph
-    game = Simulation(screen_width, screen_height, console_font_size,textured, hashed_map, step_size, matrix_wall, color_to_glyph_wall)
+
+    # Classic
+    game = Simulation(screen_width = 120, 
+                      screen_height = 40,
+                      console_font_size= 16, 
+                      simulation_type = 'classic', 
+                      step_size = 0.1, 
+                      matrix_wall = Wall_Sprite.matrix, 
+                      color_to_glyph_wall = Wall_Sprite.color_to_glyph)
+
+    # Textured
+    # game = Simulation(screen_width = 320, 
+    #                 screen_height = 107,
+    #                 console_font_size= 4, 
+    #                 simulation_type = 'textured', 
+    #                 step_size = 0.1, 
+    #                 matrix_wall = Wall_Sprite.matrix, 
+    #                 color_to_glyph_wall = Wall_Sprite.color_to_glyph)
 
     # Defining user controlls
     print('')
@@ -439,22 +465,14 @@ if __name__ == '__main__':
     print('')
     print('Forward:     W')
     print('Backward:    S')
-    print('Turn Left:   A')
-    print('Turn Right:  D')
+    print('Move Left:   A')
+    print('Move Right:  D')
     print('')
-    print('Move Left:   Q')
-    print('Move Right:  E')
+    print('Turn Left:   Q')
+    print('Turn Right:  E')
     print('')
     print('Ouit:        P')
     print('')
-    print('There are five maps to explore.')
-    print('To change maps at any time press the following numbers.')
-    print('')
-    print('Map One:     1')
-    print('Map Two:     2')
-    print('Map Three:   3')
-    print('Map Four:    4')
-    print('Map Five:    5')
     print('')
     input('Press the Enter to continue...')
 

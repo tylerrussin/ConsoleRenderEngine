@@ -1,9 +1,9 @@
 import time
 
-def key_press_q(player_a, player_y, player_x, player_radian_index, hashed_map, player_radians_list, speed, elapsed_time, map):
+def key_press_q(player_a, player_y, player_x, player_radian_index, simulation_type, player_radians_list, speed, elapsed_time, map):
     '''Handles the leftward rotation of the player through the Q button''' 
     # Handeling 4 point turn rotation     
-    if hashed_map:
+    if simulation_type == 'hashed':
         if player_radian_index == 0:
             player_radian_index = 3
         else:
