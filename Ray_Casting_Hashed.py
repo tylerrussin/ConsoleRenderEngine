@@ -16,11 +16,18 @@ from maps.Map_Three import map_three
 from maps.Map_Four import map_four
 from maps.Map_Five import map_five
 from maps.Map_Six import map_six
-from maps.Map_Seven import map_seven 
+from maps.Map_Seven import map_seven
+from maps.Map_Eight import map_eight
 from sprites.Wall_Sprite import matrix_glyph
 from sprites.Wall_Sprite import matrix_color
+from sprites.Wall_Sprite import color_to_glyph
 
 class Game():
+
+    shade_dict = {' ': 4,  # it is C for map eight!!!
+                  'W': 3,
+                  'R': 2,
+                  'G': 1}
 
     def __init__(self):
         self.screen_width = 320         # Console Screen Size X (columns)
@@ -43,7 +50,9 @@ class Game():
         self.tp2 = None
         self.map = None
         self.view = None
-        self.wall = Sprite(matrix_glyph, matrix_color) # Initialize Sprite
+        self.wall = Sprite(matrix_glyph, matrix_color, color_to_glyph) # Initialize Sprite
+
+        self.screen_string = None
 
     def on_user_create(self):
 
@@ -59,9 +68,10 @@ class Game():
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)
         curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_RED)
         curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_WHITE)
+        curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_BLACK)
 
         # Initiate with map
-        self.update_map(map_six)
+        self.update_map(map_seven)
 
         self.map_height = len(self.map)
         self.map_width = len(self.map[0])
@@ -71,10 +81,10 @@ class Game():
         self.tp2 = time.perf_counter()
 
         # Checking if map file exists
-        if os.path.exists('Hashed_Maps/map_seven.json'):
+        if os.path.exists('classes/Hashed_Maps/map_seven.json'):
             print('map file exists')
             # Opening JSON file
-            f = open('Hashed_Maps/map_seven.json')
+            f = open('classes/Hashed_Maps/map_seven.json')
             
             # returns JSON object as
             # a dictionary
@@ -86,8 +96,8 @@ class Game():
     
         else:
             # Have to create hashed map
-            print('Creating hashed map. This may take a while...')
-            self.create_hashed_map()
+            print('The hashed map specified does not exist...')
+            
     
     def update_map(self, new_map):
 
@@ -119,6 +129,7 @@ class Game():
             curses.endwin()
             os.system(f"mode con: cols={120} lines={40}")
             command_line_font(16)
+            del self.hashed_map
             sys.exit()
 
 
@@ -190,10 +201,11 @@ class Game():
                 self.player_x += math.sin(self.player_a - 1.57) * self.speed * elapsed_time
                 self.player_y += math.cos(self.player_a - 1.57) * self.speed * elapsed_time
 
-        screen_string = self.hashed_map.get("({}, {}, {})".format(round(self.player_a, 2), round(self.player_y, 1), round(self.player_x, 1)))
+        # Get current screen
+        self.screen_string = self.hashed_map.get("({}, {}, {})".format(round(self.player_a, 2), round(self.player_y, 1), round(self.player_x, 1)))
         try:
 
-            self.view.addstr(0, 0, screen_string)
+            self.render_screen()
             w_key = False
             s_key = False
             a_key = False
@@ -214,128 +226,23 @@ class Game():
                 self.player_x += math.sin(self.player_a - 1.57) * self.speed * elapsed_time
                 self.player_y += math.cos(self.player_a - 1.57) * self.speed * elapsed_time
 
-            screen_string = self.hashed_map.get("({}, {}, {})".format(round(self.player_a, 2), round(self.player_y, 1), round(self.player_x, 1)))
-            self.view.addstr(0, 0, screen_string)
-        self.view.refresh()
-
+            self.screen_string = self.hashed_map.get("({}, {}, {})".format(round(self.player_a, 2), round(self.player_y, 1), round(self.player_x, 1)))
+            self.render_screen()
+            
         
+    def render_screen(self):
+        screen_list = [char for char in self.screen_string]
+        index = 0
+        for char in screen_list:
+            coord_str = str(index / self.screen_width)
+            coord_str = coord_str.split('.')
+            y, x = coord_str[0], '0.' + coord_str[1]
+            index = index + 1
+            y = int(y)
+            x = int(float(x) * self.screen_width)
+            self.view.addstr(y, x, ' ', curses.color_pair(self.shade_dict[char]))
 
-
-    def create_hashed_map(self):
-        hashed_map = {}
-
-        # Traversing the entire map
-        for radian_hash in self.player_radians_list:
-            for y_hash in np.arange(0.0, self.map_height, 0.1):
-                for x_hash in np.arange(0.0, self.map_width, 0.1):
-
-
-                    # If we are in a wall
-                    if self.map[int(y_hash)][int(x_hash)] == '#':
-                        hashed_map.update({'({}, {}, {})'.format(round(radian_hash, 2), round(y_hash, 1), round(x_hash, 1)): '#'*(self.screen_width*self.screen_height)})
-                    else:
-
-                        for x in range(0, self.screen_width):
-
-                            # For each column, calculate the projected ray angle into world space
-                            ray_angle = (radian_hash - self.fov/2.0) + (float(x) / float(self.screen_width)) * self.fov
-
-                            # Find distance to wall
-                            step_size = 0.1         # Increment size for ray casting, decrease to increase
-                            distance_to_wall = 0     #                                      resolution
-
-                            hit_wall = False       # Set when ray hits wall block
-
-                            eye_x = math.sin(ray_angle) # Unit vector for ray in player space
-                            eye_y = math.cos(ray_angle)
-
-                            sample_x = 0.0 # How far across the texture are we going to sample
-
-                            # Incrementally cast ray from player, along ray angle, testing for 
-                            # intersection with a block
-                            while hit_wall == False and distance_to_wall < self.depth:
-
-                                distance_to_wall += step_size
-                                test_x = int(x_hash + eye_x * distance_to_wall)
-                                test_y = int(y_hash + eye_y * distance_to_wall)
-
-                                # Test if ray is out of bounds
-                                if test_x < 0 or test_x >= self.map_width or test_y < 0 or test_y >= self.map_height:
-
-                                    hit_wall = True         # Just set distance to maximum depth
-                                    distance_to_wall = self.depth
-
-                                else:
-
-                                    # Ray is inbounds so test to see if the ray cell is a wall block
-                                    if self.map[test_y][test_x] == '#':
-
-                                        # Ray has hit wall
-                                        hit_wall = True
-
-                                        # Determine where on the wall the ray will hit. Break block boundry into 4 line segments
-                                        # When a wall is hit calculate the mid-point (0.5) since the wals are unit squares
-                                        block_mid_x =  test_x  + 0.5
-                                        block_mid_y = test_y + 0.5
-
-                                        test_point_x = x_hash + eye_x * distance_to_wall
-                                        test_point_y = y_hash + eye_y * distance_to_wall
-
-                                        test_angle = math.atan2((test_point_y - block_mid_y), (test_point_x - block_mid_x))
-
-                                        if test_angle >= -3.14159 * 0.25 and test_angle < 3.14159 * 0.25:
-                                            sample_x = test_point_y - test_y
-                                        if test_angle >= 3.14159 * 0.25 and test_angle < 3.14159 * 0.75:
-                                            sample_x = test_point_x - test_x
-                                        if test_angle < -3.14159 * 0.25 and test_angle >= -3.14159 * 0.75:
-                                            sample_x = test_point_x - test_x
-                                        if test_angle >= 3.14159 * 0.75 or test_angle < -3.14159 * 0.75:
-                                            sample_x = test_point_y - test_y
-
-
-
-                            # Calculate distance to ceiling and floor
-                            ceiling = float(self.screen_height/2.0) - self.screen_height / float(distance_to_wall)
-                            floor = self.screen_height - ceiling
-
-                            for y in range(0, self.screen_height):
-
-                                self.screen[self.screen_height - 1][self.screen_width - 1] = ''
-                                # Each Row
-                                if y < ceiling:
-                                    # Shading as black space
-                                    self.screen[y][x] = ' '
-
-                                elif y > ceiling and y <= floor: # Drawing Wall
-
-                                    if distance_to_wall < self.depth:
-
-                                        sample_y = (y - ceiling) / (floor - ceiling)
-                                        color = self.wall.sample_color(sample_x, sample_y)
-
-                                        self.screen[y][x] = color
-                                            
-                                    else:
-                                        self.screen[y][x] = ' ' # too far don't render
-
-
-                                else: # Floor
-
-                                    # Shading in as dark green pixle
-                                    self.screen[y][x] = 'G'
-
-
-                        self.screen[self.screen_height - 1][self.screen_width - 1] = ''
-                        screen_string =  ''.join(ele for sub in self.screen for ele in sub)
-                        # Saving screen value in hash table
-                        hashed_map.update({'({}, {}, {})'.format(round(radian_hash, 2), round(y_hash, 1), round(x_hash, 1)): screen_string})
-
-        # Saving hashed map to class
-        self.hashed_map = hashed_map
-
-        # Saving the hashed map as json file for future use
-        with open("Hashed_Maps/map_seven.json", "w") as outfile:
-            json.dump(hashed_map, outfile)
+        self.view.refresh()
 
         
 if __name__ == '__main__':

@@ -1,12 +1,14 @@
 import os
 import sys
-import math
-import json
-import numpy as np
 
 script_dir = os.path.dirname( __file__ )
 main_dir = os.path.join( script_dir, '..' )
 sys.path.append( main_dir )
+
+import math
+import json
+import numpy as np
+
 from maps.Map_One import map_one
 from maps.Map_Two import map_two
 from maps.Map_Three import map_three
@@ -26,26 +28,27 @@ class Map_Hasher():
     def __init__(self, screen_width, screen_height, step_size):
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.step_size = step_size                                             # Increment size for ray casting, decrease to increase
+        self.step_size = step_size                                                               # Increment size for ray casting, decrease to increase
 
         self.map_height = None
         self.map_width = None
         self.map = None
         self.map_path = None
 
-        self.screen = [[0 for x in range(self.screen_width)] for y in range(self.screen_height)]
+        self.screen = [['0' for x in range(self.screen_width)] for y in range(self.screen_height)]  # Creating empty screen matrix
 
-        self.player_radians_list = [0.00, 1.57, 3.14, 4.71]                     # Player angle
-        self.fov = 3.14159 / 4.0                                                # Field of View
-        self.depth = 16.0                                                       # Maximum rendering distance
-        self.speed = 5.0                                                        # Walking Speed
-
-        self.wall = Sprite(matrix_glyph, matrix_color, color_to_glyph)          # Initialize Sprite
+        self.player_radians_list = [0.00, 1.57, 3.14, 4.71]                                       # Player angle
+        self.fov = 3.14159 / 4.0                                                                  # Field of View
+        self.depth = 16.0                                                                         # Maximum rendering distance
+            
+        self.wall = Sprite(matrix_glyph, matrix_color, color_to_glyph)                            # Initialize Sprite
 
 
     def update_map(self, new_map, map_name):
 
         self.map = new_map
+        self.map_height = len(self.map)
+        self.map_width = len(self.map[0])
         self.map_path = 'Hashed_Maps/{}.json'.format(map_name)
         # Setting Player start position and processing map
         for row, list in enumerate(self.map):
@@ -53,14 +56,11 @@ class Map_Hasher():
                 if value == 'p':
                     self.map[row][col] = '.'
 
-        self.map_height = len(self.map)
-        self.map_width = len(self.map[0])
-
 
     def create_hashed_map(self):
         # Checking if map file exists
         if os.path.exists(self.map_path):
-            print('map filename already exists...')
+            print('Map filename already exists...')
             sys.exit()
     
         else:
@@ -146,27 +146,21 @@ class Map_Hasher():
 
                             for y in range(0, self.screen_height):
 
-                                self.screen[self.screen_height - 1][self.screen_width - 1] = ''
                                 # Each Row
                                 if y < ceiling:
                                     # Shading in C for ceiling
                                     self.screen[y][x] = 'C'
 
                                 elif y > ceiling and y <= floor: # Drawing Wall
-
                                     if distance_to_wall < self.depth:
-
                                         sample_y = (y - ceiling) / (floor - ceiling)
                                         color = self.wall.sample_color(sample_x, sample_y)
-
                                         self.screen[y][x] = color
                                             
                                     else:
                                         self.screen[y][x] = ' ' # too far don't render
 
-
                                 else: # Floor
-
                                     # Shading in G for ground
                                     self.screen[y][x] = 'G'
 
@@ -181,6 +175,7 @@ class Map_Hasher():
         with open(self.map_path, "w") as outfile:
             json.dump(hashed_map, outfile)
 
+        print('Map hashing has completed! saved to: ' + self.map_path)
         del hashed_map
         sys.exit()
 
