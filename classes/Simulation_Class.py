@@ -252,12 +252,10 @@ class Simulation():
 
 
     def run_classic(self):
+        '''Running the Greyscale simulation "Classic" Version. Also contains map and stats'''
+
+        # Calculate Screen
         self.calculate_screen()
-        self.screen[self.screen_height - 1][self.screen_width - 1] = ''
-
-        # Display Stats
-        stats = f'X={"%.2f" % self.player_x}, Y={"%.2f" % self.player_y}, A={"%.2f" % self.player_a}, FPS={"%.2f" % (1.0 / self.elapsed_time)}'
-
 
         # Display Map
         for nx in range(0, self.map_width):
@@ -266,30 +264,24 @@ class Simulation():
                 self.screen[ny + 1][nx] = self.map[ny][nx]
                 
         self.screen[int(self.player_y)+1][int(self.player_x)] = 'p'
-        screen_string =  ''.join(ele for sub in self.screen for ele in sub)
 
-        self.view.addstr(0, 0, screen_string)
-        self.view.addstr(0, 0, stats)
+        # Display Stats
+        stats = [char for char in f'X={"%.2f" % self.player_x}, Y={"%.2f" % self.player_y}, A={"%.2f" % self.player_a}, FPS={"%.2f" % (1.0 / self.elapsed_time)}']
+        for index in range(len(stats)):
+            self.screen[0][index] = stats[index]
+
+        # Display Frame (problem with the \0 in python 3.9. empty string also works. null termination only needed for c++ version)
+        self.screen[self.screen_height - 1][self.screen_width - 1] = ''
+        self.view.addstr(0, 0, ''.join(ele for sub in self.screen for ele in sub))
         self.view.refresh()
+
 
     def run_textured(self):
+        '''Running the simulation with default Brick Texture'''
+
+        # Calculate Screen
         self.calculate_screen()
-        self.screen[self.screen_height - 1][self.screen_width - 1] = ''
-        screen_string =  ''.join(ele for sub in self.screen for ele in sub)
-        screen_list = [char for char in screen_string]
-        index = 0
-        for char in screen_list:
-            coord_str = str(index / self.screen_width)
-            coord_str = coord_str.split('.')
-            y, x = coord_str[0], '0.' + coord_str[1]
-            index = index + 1
-            y = int(y)
-            x = int(float(x) * self.screen_width)
-            self.view.addstr(y, x, ' ', curses.color_pair(self.shade_dict[char]))
         self.view.refresh()
-
-
-
 
 
     def calculate_screen(self):
@@ -299,16 +291,14 @@ class Simulation():
             ray_angle = (self.player_a - self.fov/2.0) + (float(x) / float(self.screen_width)) * self.fov
 
             # Find distance to wall
-            step_size = self.step_size         # Increment size for ray casting, decrease to increase
-            distance_to_wall = 0     #                                      resolution
+            step_size = self.step_size    # Increment size for ray casting, decrease to increase resolution
+            distance_to_wall = 0                                   
 
             hit_wall = False       # Set when ray hits wall block
             boundary = False      # Set when ray hits boundary between two wall blocks
 
             eye_x = math.sin(ray_angle) # Unit vector for ray in player space
             eye_y = math.cos(ray_angle)
-
-            sample_x = 0.0 # How far across the texture are we going to sample
 
             # Incrementally cast ray from player, along ray angle, testing for 
             # intersection with a block
@@ -332,109 +322,115 @@ class Simulation():
                         # Ray has hit wall
                         hit_wall = True
 
-                        if self.simulation_type == 'textured':
-                            # Determine where on the wall the ray will hit. Break block boundry into 4 line segments
-                            # When a wall is hit calculate the mid-point (0.5) since the wals are unit squares
-                            block_mid_x =  test_x  + 0.5
-                            block_mid_y = test_y + 0.5
+                        # To highlight tile boundaries, cast a ray from each corner
+                        # of the tile, to the player. The more coincident this ray
+                        # is to the rendering ray, the closer we are to a tile 
+                        # boundary, which we'll shade to add detail to the walls
+                        p = []
 
-                            test_point_x = self.player_x + eye_x * distance_to_wall
-                            test_point_y = self.player_y + eye_y * distance_to_wall
+                        # Test each corner of hit tile, storing the distance from
+                        # the player, and the calculated dot product of the two rays
+                        for tx in range(0,2):
+                            for ty in range(0,2):
 
-                            test_angle = math.atan2((test_point_y - block_mid_y), (test_point_x - block_mid_x))
+                                # Angle of corner to eye
+                                vy = float(test_y) + ty - self.player_y
+                                vx = float(test_x) + tx - self.player_x
+                                d = math.sqrt(vx*vx + vy*vy)
+                                dot = (eye_x * vx / d) + (eye_y * vy / d)
+                                p.append((d, dot))
+                        
+                        # Sort Pairs from closest to farthest
+                        p.sort(key=lambda x: x[0])
 
-                            if test_angle >= -3.14159 * 0.25 and test_angle < 3.14159 * 0.25:
-                                sample_x = test_point_y - test_y
-                            if test_angle >= 3.14159 * 0.25 and test_angle < 3.14159 * 0.75:
-                                sample_x = test_point_x - test_x
-                            if test_angle < -3.14159 * 0.25 and test_angle >= -3.14159 * 0.75:
-                                sample_x = test_point_x - test_x
-                            if test_angle >= 3.14159 * 0.75 or test_angle < -3.14159 * 0.75:
-                                sample_x = test_point_y - test_y
-                    
-                        else: # it is classic
-                            # To highlight tile boundaries, cast a ray from each corner
-                            # of the tile, to the player. The more coincident this ray
-                            # is to the rendering ray, the closer we are to a tile 
-                            # boundary, which we'll shade to add detail to the walls
-                            p = []
+                        # First two/three are closest (we will never see all four)
+                        bound = 0.01
+                        if math.acos(p[0][1]) < bound: boundary = True
+                        if math.acos(p[1][1]) < bound: boundary = True
+                        if math.acos(p[2][1]) < bound: boundary = True
 
-                            # Test each corner of hit tile, storing the distance from
-                            # the player, and the calculated dot product of the two rays
-                            for tx in range(0,2):
-                                for ty in range(0,2):
 
-                                    # Angle of corner to eye
-                                    vy = float(test_y) + ty - self.player_y
-                                    vx = float(test_x) + tx - self.player_x
-                                    d = math.sqrt(vx*vx + vy*vy)
-                                    dot = (eye_x * vx / d) + (eye_y * vy / d)
-                                    p.append((d, dot))
-                            
-                            # Sort Pairs from closest to farthest
-                            p.sort(key=lambda x: x[0])
+                        # Determine where on the wall the ray will hit. Break block boundry into 4 line segments
+                        # When a wall is hit calculate the mid-point (0.5) since the wals are unit squares
+                        block_mid_x =  test_x  + 0.5
+                        block_mid_y = test_y + 0.5
 
-                            # First two/three are closest (we will never see all four)
-                            bound = 0.01
-                            if math.acos(p[0][1]) < bound: boundary = True
-                            if math.acos(p[1][1]) < bound: boundary = True
-                            if math.acos(p[2][1]) < bound: boundary = True
+                        test_point_x = self.player_x + eye_x * distance_to_wall
+                        test_point_y = self.player_y + eye_y * distance_to_wall
+
+                        test_angle = math.atan2((test_point_y - block_mid_y), (test_point_x - block_mid_x))
+
+                        if test_angle >= -3.14159 * 0.25 and test_angle < 3.14159 * 0.25:
+                            sample_x = test_point_y - test_y
+                        if test_angle >= 3.14159 * 0.25 and test_angle < 3.14159 * 0.75:
+                            sample_x = test_point_x - test_x
+                        if test_angle < -3.14159 * 0.25 and test_angle >= -3.14159 * 0.75:
+                            sample_x = test_point_x - test_x
+                        if test_angle >= 3.14159 * 0.75 or test_angle < -3.14159 * 0.75:
+                            sample_x = test_point_y - test_y
 
 
             # Calculate distance to ceiling and floor
             ceiling = float(self.screen_height/2.0) - self.screen_height / float(distance_to_wall)
             floor = self.screen_height - ceiling
 
+            # Shader walls based on distance
+            shade = ' '
+            if distance_to_wall <= self.depth / 4.0:         shade = u'\u2588'     # Very Close
+            elif distance_to_wall < self.depth / 3.0:        shade = u'\u2593'
+            elif distance_to_wall < self.depth / 2.0:        shade = u'\u2592'
+            elif distance_to_wall < self.depth:              shade = u'\u2591'
+            else:                                            shade = ' '            # Too far away
+
+            if boundary:                                     shade = ' '            # Black it out
+
             for y in range(0, self.screen_height):
 
-                if self.simulation_type == 'textured':
-                    # Each Row
-                    if y < ceiling:
-                        # Shading in C for ceiling
-                        self.screen[y][x] = 'C'
+                # Each Row
+                if y < ceiling:
+                    if self.simulation_type == 'classic':
+                        self.screen[y][x] = ' '
 
-                    elif y > ceiling and y <= floor: # Drawing Wall
+                    else:
+                        self.view.addstr(y, x, ' ')             # Textured
+
+                elif y > ceiling and y <= floor:
+                    if self.simulation_type == 'classic':
+                        self.screen[y][x] = shade
+
+                    else:                                       # Textured
                         if distance_to_wall < self.depth:
+
                             sample_y = (y - ceiling) / (floor - ceiling)
                             color = self.wall.sample_color(sample_x, sample_y)
-                            self.screen[y][x] = color
 
+                            self.screen[y][x] = ' '                                             # Setting to a blank space for coloring
+                            self.screen[self.screen_height - 1][self.screen_width - 1] = ''     # Removeing last cell for curser
+
+                            if color == 'R':
+                                self.view.addstr(y, x, str(self.screen[y][x]), curses.color_pair(2))    # Shading Red
+                            else:
+                                self.view.addstr(y, x, str(self.screen[y][x]), curses.color_pair(3))    # Shading White
+                        
                         else:
-                            self.screen[y][x] = ' ' # too far don't render
+                           self.view.addstr(y, x, ' ')      # Too far don't render
+                else: # Floor
+                    if self.simulation_type == 'classic':
+                        # Shade floor based on distance
+                        b = 1.0 - ((float(y) - self.screen_height/2.0) / (float(self.screen_height) / 2.0))
+                        if b < 0.25:        shade_2 = '#'
+                        elif b < 0.5:       shade_2 = 'x'
+                        elif b < 0.75:      shade_2 = '.'
+                        elif b < 0.9:       shade_2 = '-'
+                        else:               shade_2 = " "
+                        self.screen[y][x] = shade_2
 
-                    else: # Floor
-                        # Shading in G for ground
-                        self.screen[y][x] = 'G'
-
-                else: # it is classic
-
-                     # Shader walls based on distance
-                    shade = ' '
-                    if distance_to_wall <= self.depth / 4.0:         shade = u'\u2588'     # Very Close
-                    elif distance_to_wall < self.depth / 3.0:        shade = u'\u2593'
-                    elif distance_to_wall < self.depth / 2.0:        shade = u'\u2592'
-                    elif distance_to_wall < self.depth:              shade = u'\u2591'
-                    else:                                            shade = ' '        # Too far away
-
-                    if boundary:                                     shade = ' ' # Black it out
-
-                    for y in range(0, self.screen_height):
-
-                        # Each Row
-                        if y < ceiling:
-                            self.screen[y][x] = ' '
-                        elif y > ceiling and y <= floor:
-                            self.screen[y][x] = shade
-                        else: # Floor
-
-                            # Shade floor based on distance
-                            b = 1.0 - ((float(y) - self.screen_height/2.0) / (float(self.screen_height) / 2.0))
-                            if b < 0.25:        shade_2 = '#'
-                            elif b < 0.5:       shade_2 = 'x'
-                            elif b < 0.75:      shade_2 = '.'
-                            elif b < 0.9:       shade_2 = '-'
-                            else:               shade_2 = " "
-                            self.screen[y][x] = shade_2
+                    else:
+                        # Shading in as dark green pixle Textured
+                        if x == self.screen_width - 1 and y == self.screen_height -1:
+                            self.view.addstr(y, x, '')
+                        else:
+                            self.view.addstr(y, x, ' ', curses.color_pair(1))    # Shading Green
 
 
 if __name__ == '__main__':
