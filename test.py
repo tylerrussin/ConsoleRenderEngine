@@ -30,11 +30,13 @@ while True:
         # Changing back to default font size
         sys.exit()
     # curses.color_pair(2)
-    string = ' ' + u'\u2588' + ' '
+    # string = ' ' + u'\u2588' + ' '
+    string = ' ' + u'\u00A0' + ' '
     view.addstr(0, 0, string, curses.color_pair(2))
-    rectangle(view, 1,0, 1+5+1, 1+30+1)
     view.refresh()
 
         
 
  #   myConsole.WriteConsoleOutputCharacter(Characters=output, WriteCoord=win32console.PyCOORDType(0, 0)) # Print at coordinates
+
+
