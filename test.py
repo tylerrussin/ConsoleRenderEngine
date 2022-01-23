@@ -1,14 +1,15 @@
 import os
 import sys
-import win32console, win32con
+# import win32console, win32con
 import keyboard
 import curses
+from curses.textpad import Textbox, rectangle
 
 view = curses.initscr()
 curses.curs_set(False)
 curses.start_color()
 curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)
-curses.init_pair(2, curses.COLOR_RED, curses.COLOR_RED)
+curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_RED)
 curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_WHITE)
 
 
@@ -28,14 +29,12 @@ while True:
     if keyboard.is_pressed('P'):
         # Changing back to default font size
         sys.exit()
-
-    screen[19][50] = u"\u001b[31mH\u001b[0m"
-    screen[40 - 1][120 - 1] = ''
-    output = ''.join(ele for sub in screen for ele in sub)
-    view.addch(0, 0, u"\u001b[31mH\u001b[0m")
+    # curses.color_pair(2)
+    string = ' ' + u'\u2588' + ' '
+    view.addstr(0, 0, string, curses.color_pair(2))
+    rectangle(view, 1,0, 1+5+1, 1+30+1)
     view.refresh()
 
         
 
-    # myConsole.WriteConsoleOutputCharacter(Characters=output, WriteCoord=win32console.PyCOORDType(0, 0)) # Print at coordinates
-
+ #   myConsole.WriteConsoleOutputCharacter(Characters=output, WriteCoord=win32console.PyCOORDType(0, 0)) # Print at coordinates

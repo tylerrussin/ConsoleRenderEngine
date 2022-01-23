@@ -8,6 +8,7 @@ from maps.Map_Five import map_five
 from maps.Map_Six import map_six
 from maps.Map_Seven import map_seven
 from maps.Map_Eight import map_eight
+from maps.Map_Nine import map_nine
 
 
 if __name__ == '__main__':
@@ -41,7 +42,7 @@ if __name__ == '__main__':
     input('Press the Enter to continue...')
 
     # Initiate with map_six
-    game.update_map(map_eight, 'map_eight')
+    game.update_map(map_nine, 'map_nine')
     game.on_user_create()
 
     while True:

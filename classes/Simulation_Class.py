@@ -62,7 +62,7 @@ class Simulation():
         self.player_radian_index = 0
         self.fov = 3.14159 / 4.0        # Field of View
         self.depth = 16.0               # Maximum rendering distance
-        self.speed = 5.0                # Walking Speed
+        self.speed = 2.0                # Walking Speed
         
         self.wall = Sprite(matrix_wall, color_to_glyph_wall) # Initialize Sprite
         self.view = None
@@ -85,10 +85,8 @@ class Simulation():
                 print('Loading in map...')
                 f = open(self.map_path)
                 self.hashed_map_dict = json.load(f)
-                time.sleep(5) # Clearing the load
                 f.close()
-                time.sleep(5) # Clearing the load
-    
+                
             else:
                 # Map not at located at path
                 print('The hashed map specified does not exist...')
@@ -210,19 +208,34 @@ class Simulation():
         
         # Get current screen
         screen_string = self.hashed_map_dict.get("({}, {}, {})".format(round(self.player_a, 2), round(self.player_y, 1), round(self.player_x, 1)))
+        try:
+            # Prep Screen for shadding
+            screen_list = [char for char in screen_string]
+            index = 0
+            for char in screen_list:
+                coord_str = str(index / self.screen_width)
+                coord_str = coord_str.split('.')
+                y, x = coord_str[0], '0.' + coord_str[1]
+                index = index + 1
+                y = int(y)
+                x = int(float(x) * self.screen_width)
+                self.view.addstr(y, x, ' ', curses.color_pair(self.shade_dict[char]))   # Add pixle to screen
+            self.view.refresh()
+        except:
+            if keyboard.is_pressed('D'):
+                self.player_x += math.sin(self.player_a - 1.57) * self.speed * self.elapsed_time
+                self.player_y += math.cos(self.player_a - 1.57) * self.speed * self.elapsed_time
+            elif keyboard.is_pressed('A'):
+                self.player_x += math.sin(self.player_a + 1.57) * self.speed * self.elapsed_time
+                self.player_y += math.cos(self.player_a + 1.57) * self.speed * self.elapsed_time
+            elif keyboard.is_pressed('W'):
+                self.player_x -= math.sin(self.player_a) * self.speed * self.elapsed_time
+                self.player_y -= math.cos(self.player_a) * self.speed * self.elapsed_time
+            elif keyboard.is_pressed('S'):
+                self.player_x += math.sin(self.player_a) * self.speed * self.elapsed_time
+                self.player_y += math.cos(self.player_a) * self.speed * self.elapsed_time
 
-        # Prep Screen for shadding
-        screen_list = [char for char in screen_string]
-        index = 0
-        for char in screen_list:
-            coord_str = str(index / self.screen_width)
-            coord_str = coord_str.split('.')
-            y, x = coord_str[0], '0.' + coord_str[1]
-            index = index + 1
-            y = int(y)
-            x = int(float(x) * self.screen_width)
-            self.view.addstr(y, x, ' ', curses.color_pair(self.shade_dict[char]))   # Add pixle to screen
-        self.view.refresh()
+
 
 
     def calculate_screen(self):
