@@ -45,6 +45,8 @@ set_current_console_font_ex_func.restype = BOOL
 
 
 def command_line_font(font_height=16):
+    ''' Using python's ctypes to change the font size of the command prompt'''
+
     # Get stdout handle
     stdout = get_std_handle_func(STD_OUTPUT_HANDLE)
     if not stdout:

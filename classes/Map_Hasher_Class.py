@@ -1,6 +1,7 @@
 import os
 import sys
 
+# Path restructure for imports
 script_dir = os.path.dirname( __file__ )
 main_dir = os.path.join( script_dir, '..' )
 sys.path.append( main_dir )
@@ -14,34 +15,68 @@ from sprites.Wall_Sprite import matrix
 from sprites.Wall_Sprite import color_to_glyph
 
 class Map_Hasher():
+    ''' Class for creating a fully hashed mapping of a 3d scene. This is done for a runtime performance increase.
+        Key features of this class are the simplification of the angle system that the player can see and the JSON 
+        file created for the stored map. To use this class a screen width, screen height, and resolution stepsize
+        need to be specified on the creation of a class instance. Everything else in the class is standardized for
+        simulation resolution and performance. The map method must also be called before hashing can begin.
+       
+        Attributes:
+            screen_width (int): the width of the outputed screen
+            screen_height (int): the height of the ouptuted screen
+            step_size (float): the smaller the number the higher the texture resolution
+            map_height (int): height of 2d map matrix
+            map_width (int): width of 2d map matrix
+            map (array): 2d matrix contarinting world information
+            map_path (str): a path to dump and grab json objects
+            screen (array): 2d matrix that is rendered to the outputed screen
+            player_radians_list (array): list of four possible player angles
+            fov (int): defines the players field of view rendered to the screen
+            depth (float): the max distance that a ray will be casted
+            wall (obj): is an instance of the sprite class containing the wall sprite
+            '''
 
     def __init__(self, screen_width, screen_height, step_size):
-        self.screen_width = screen_width
-        self.screen_height = screen_height
-        self.step_size = step_size                                                               # Increment size for ray casting, decrease to increase
+        ''' The constructor for Map Hasher class.
+        
+            Parameters:
+                screen_width (int): the width of the outputed screen
+                screen_height (int): the height of the ouptuted screen
+                step_size (float): the smaller the number the higher the texture resolution'''     
+
+
+        self.screen_width = screen_width                           # Width of the outputed screen
+        self.screen_height = screen_height                         # Height of the outputed screen
+        self.step_size = step_size                                 # Determines the resolution of the textured mapping             
 
         self.map_height = None
         self.map_width = None
-        self.map = None
-        self.map_path = None
+        self.map = None                 # Map matrix
+        self.map_path = None            # Filepath to map dump location
 
-        self.screen = [['0' for x in range(self.screen_width)] for y in range(self.screen_height)]  # Creating empty screen matrix
+        self.screen = [['0' for x in range(self.screen_width)] for y in range(self.screen_height)]      # Creating empty screen matrix
 
-        self.player_radians_list = [0.00, 1.57, 3.14, 4.71]                                       # Player angle
-        self.fov = 3.14159 / 4.0                                                                  # Field of View
-        self.depth = 16.0                                                                         # Maximum rendering distance
+        self.player_radians_list = [0.00, 1.57, 3.14, 4.71]      # Player angles
+        self.fov = 3.14159 / 4.0                                 # Field of View
+        self.depth = 16.0                                        # Maximum rendering distance
             
-        self.wall = Sprite(matrix, color_to_glyph)                                                # Initialize Sprite
+        self.wall = Sprite(matrix, color_to_glyph)               # Initialize Sprite
 
 
     def update_map(self, new_map, map_name):
+        ''' Loads in specified map for simulation
+            
+            Parameters:
+                new_map (array): a 2d matrix containing world information
+                map_name (str): string containing the maps name
+            '''
 
         self.map = new_map
         self.map_height = len(self.map)
         self.map_width = len(self.map[0])
         self.map_path = 'Hashed_Maps/{}.json'.format(map_name)
         
-        # Setting Player start position and processing map
+        # Converting player location to empty space
         for row, list in enumerate(self.map):
             for col, value in enumerate(list):
                 if value == 'p':
@@ -49,7 +84,9 @@ class Map_Hasher():
 
 
     def create_hashed_map(self):
-        # Checking if map file exists
+        '''Creates the hashed json file of the 3d enviornment'''
+
+        # Checking if map file already exists
         if os.path.exists(self.map_path):
             print('Map filename already exists...')
             sys.exit()
@@ -81,7 +118,7 @@ class Map_Hasher():
                             # Find distance to wall
                             distance_to_wall = 0
 
-                            hit_wall = False       # Set when ray hits wall block
+                            hit_wall = False       # Set when a ray hits wall block
 
                             eye_x = math.sin(ray_angle) # Unit vector for ray in player space
                             eye_y = math.cos(ray_angle)

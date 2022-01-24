@@ -2,19 +2,12 @@ from classes.Simulation_Class import Simulation
 from sprites import Wall_Sprite
 from maps.Map_One import map_one
 from maps.Map_Two import map_two
-from maps.Map_Three import map_three
-from maps.Map_Four import map_four
-from maps.Map_Five import map_five
-from maps.Map_Six import map_six
-from maps.Map_Seven import map_seven
-from maps.Map_Eight import map_eight
 
 
 if __name__ == '__main__':
 
-    # Initiate simpulation loop
-
-    # Classic
+    # Initiate simulation loop
+    # Textured Simulation
     game = Simulation(screen_width = 320, 
                     screen_height = 107,
                     console_font_size= 4, 
@@ -41,10 +34,9 @@ if __name__ == '__main__':
     input('Press the Enter to continue...')
 
     # Initiate with map_six
-    game.update_map(map_seven, 'map_seven')
+    game.update_map(map_one, 'map_one')
     game.on_user_create()
 
     while True:
         game.on_user_update()
 
-    # That's It!! - Tyler

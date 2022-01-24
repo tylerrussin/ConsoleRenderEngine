@@ -7,8 +7,7 @@ from maps.Map_Two import map_two
 if __name__ == '__main__':
 
     # Initiate simulation loop
-
-    # Hashed Simulation
+    # Hashed Colored Simulation
     game = Simulation(screen_width = 500, 
                     screen_height = 200,
                     console_font_size= 2, 
@@ -16,7 +15,7 @@ if __name__ == '__main__':
                     step_size = 0.01, 
                     matrix_wall = Wall_Sprite.matrix, 
                     color_to_glyph_wall = Wall_Sprite.color_to_glyph,
-                    greyscale = True)
+                    greyscale = False)
 
     # Defining user controlls
     print('')
