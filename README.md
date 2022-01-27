@@ -105,8 +105,6 @@ The number of rays cast out is dependent on the screen width. Each ray shot in t
 
 **Field of View **
 
-The field of view is defined in this implementation as how much of the 2$\P\pi$ radian space around the player will be displayed in the scene. $\pi$ / 4 (making up ⅛ of the total visual space information) will be the player’s seen field of view. 
+The field of view is defined in this implementation as how much of the 2/pi radian space around the player will be displayed in the scene. pi/4 (making up 1/8 of the total visual space information) will be the player’s seen field of view. 
 
-$$
-FOV = \frac{\pi}{4.0} 
-$$
+<img src="https://render.githubusercontent.com/render/math?math=FOV = \frac{\pi}{4.0}">
