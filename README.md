@@ -198,7 +198,7 @@ In the given 3d environment only three corners of a block can be seen at once du
 
 **<img src="https://render.githubusercontent.com/render/math?math=Angle\theta = cos^{-1}(DotProduct)">**
 
-```If angle < 0.05 #(boundary angle limit size) it is a boundary```
+**If angle < 0.05 #(boundary angle limit size) it is a boundary**
 
 A negative effect of this texturing approach is for each hit block three boundary lines will always be textured in. If a player is only facing one side of a block the third boundary line will be shaded in appearing through the face of the wall affecting the quality of the simulation.
 
