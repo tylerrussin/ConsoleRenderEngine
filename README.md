@@ -113,4 +113,4 @@ The field of view is defined in this implementation as how much of the two divid
 
 For each ray in the width of the screen, there is an associated angle that the ray is shooting out at in the 2d map array space. The goal is to have several rays (one for each column in the screen width) whose angles lay within the player’s field of view. This angle is calculated by taking the player’s current angle and subtracting half the field of view. We then add the current column divided by the width of the screen times the player’s field of view. The result is a ray with an angle that aligns with a given column slot within the player’s field of view.
 
-<img src="https://render.githubusercontent.com/render/math?math=Ray Angle = ( Player Angle ) + ( /frac{x}{Screen Width ) * FOV">
+<img src="https://render.githubusercontent.com/render/math?math=RayAngle = ( PlayerAngle ) + ( /frac{x}{ScreenWidth ) * FOV">
