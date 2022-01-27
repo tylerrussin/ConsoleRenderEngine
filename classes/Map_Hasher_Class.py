@@ -74,7 +74,7 @@ class Map_Hasher():
         self.map = new_map
         self.map_height = len(self.map)
         self.map_width = len(self.map[0])
-        self.map_path = 'Hashed_Maps/{}.json'.format(map_name)
+        self.map_path = 'hashed_maps/{}.json'.format(map_name)
         
         # Converting player location to empty space
         for row, list in enumerate(self.map):
