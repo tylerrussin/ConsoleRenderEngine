@@ -33,7 +33,6 @@ Users can create maps that can be rendered with any of the above-listed methods.
 
 An example of a constructed map:
 ```
-
 map_two = []
 map_two.append(list('################'))
 map_two.append(list('#.#.....p......#'))
@@ -51,7 +50,6 @@ map_two.append(list('#.##...........#'))
 map_two.append(list('#.#.........#..#'))
 map_two.append(list('#...........#..#'))
 map_two.append(list('################'))
-
 ```
 
 Player spawns in at the location of p facing the southern direction.
