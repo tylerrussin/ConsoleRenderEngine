@@ -105,7 +105,7 @@ The number of rays cast out is dependent on the screen width. Each ray shot in t
 
 **Field of View**
 
-The field of view is defined in this implementation as how much of the two divided by pi radian space around the player will be displayed in the scene. Pi divided by four (making up one eighth of the total visual space information) will be the player’s seen field of view. 
+The field of view is defined in this implementation as how much of the two divided by pi radian space around the player will be displayed in the scene. Pi divided by four (making up one-eighth of the total visual space information) will be the player’s seen field of view. 
 
 <img src="https://render.githubusercontent.com/render/math?math=FOV = \frac{\pi}{4.0}">
 
@@ -113,4 +113,4 @@ The field of view is defined in this implementation as how much of the two divid
 
 For each ray in the width of the screen, there is an associated angle that the ray is shooting out at in the 2d map array space. The goal is to have several rays (one for each column in the screen width) whose angles lay within the player’s field of view. This angle is calculated by taking the player’s current angle and subtracting half the field of view. We then add the current column divided by the width of the screen times the player’s field of view. The result is a ray with an angle that aligns with a given column slot within the player’s field of view.
 
-<img src="https://render.githubusercontent.com/render/math?math=Ray Angle \theta = (Player Angle \theta) + (/frac{x}{Screen Width) * FOV">
+<img src="https://render.githubusercontent.com/render/math?math=Ray_Angle_\theta = (Player_Angle \theta) + (/frac{x}{Screen_Width) * FOV">
