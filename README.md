@@ -1,14 +1,14 @@
-#Ray Casting Algorithm
+# Ray Casting Algorithm
 
 **Gallary**
 
 ![](img/gallery.png)
 
-###Introduction
+### Introduction
 
 Ray Casting is a lightweight technique for 3D graphical rendering that when implemented correctly creates a compelling illusion of an explorable 3d space. This project explores the concepts of ray casting and allows the user to use various methods of rendering the environment. 
 
-###Usage
+### Usage
 
 This codebase is built to run on Windows computers and the virtual environment requires python 3.7 to be installed.
 
@@ -75,7 +75,7 @@ Ray Casting Classic Executable [Here](https://drive.google.com/file/d/153Kjcn8uF
 
 Ray Casting Textured Executable [Here](https://drive.google.com/file/d/1R-rmk3PQfAUNCWO82qQgjGl1lbZbg5ZQ/view?usp=sharing)
 
-#Overview of the Ray Casting Algorithm and its implementation
+# Overview of the Ray Casting Algorithm and its implementation
 
 **The Command Prompt**
 
@@ -93,7 +93,7 @@ ASCII (American Standard Code for Information Interchange) Characters are encode
 
 To create a more detailed representation of the 3D simulation the cmd font sizes can be altered to a smaller scale. The change to a smaller font size forces each text cell to be closer to the size of a traditional pixel. A custom connection to interface with the command lines font size has been written with python c-types allowing for C commands to be integrated within the ray casting program.
 
-###Ray Casting
+### Ray Casting
 
 **Defining the Map**
 
