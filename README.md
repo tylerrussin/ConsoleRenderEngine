@@ -13,10 +13,11 @@ Ray Casting is a lightweight technique for 3D graphical rendering that when impl
 This codebase is built to run on Windows computers and the virtual environment requires python 3.7 to be installed.
 
 The following files:
-Ray_Casting_Classic.py
-Ray_Casting_Textured.py
-Ray_Casting_Hashed.py
-Ray_Casting_Hashed_color.py
+
+- Ray_Casting_Classic.py
+- Ray_Casting_Textured.py
+- Ray_Casting_Hashed.py
+- Ray_Casting_Hashed_color.py
 
 Are all created to demonstrate different rendering methods of the Simulation Class within the repo. All rendering methods are built on top of the same ray casting algorithm. To test each method the associated file can be run directly.
 
