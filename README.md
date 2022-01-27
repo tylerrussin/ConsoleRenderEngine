@@ -1,12 +1,12 @@
 # Ray Casting Algorithm
 
-**Gallary**
-
-![](img/gallery.png)
-
 ### Introduction
 
 Ray Casting is a lightweight technique for 3D graphical rendering that when implemented correctly creates a compelling illusion of an explorable 3d space. This project explores the concepts of ray casting and allows the user to use various methods of rendering the environment. 
+
+**Gallary**
+
+![](img/gallery.png)
 
 ### Usage
 
