@@ -96,7 +96,7 @@ To create a more detailed representation of the 3D simulation the cmd font sizes
 
 **Defining the Map**
 
-The simulation exists as a 2d array. The array is made up of arrays of strings representing the objects in the 3d space. The characters used in the 2d array are ‘p’ for player location, ‘#’ for wall location, ‘.’ for empty space. In this space, each character is defined as a one-by-one unit square. The implemented map is a 16 by 16 2d array. 
+The simulation exists as a 2d array. The array is made up of arrays of strings representing the objects in the 3d space. The characters used in the 2d array are ```‘p’``` for player location, ```‘#’``` for wall location, ```‘.’``` for empty space. In this space, each character is defined as a one-by-one unit square. The implemented map is a 16 by 16 2d array. 
 
 **Casting Rays Overview**
 
