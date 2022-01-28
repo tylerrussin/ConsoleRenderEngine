@@ -86,7 +86,7 @@ Curses is a program written in C designed to communicate with text-based display
 
 **ASCII Characters**
 
-ASCII (American Standard Code for Information Interchange) Characters are encoded values for electronic communication. ASCII characters are used in text-based display terminals such as the command prompt. These characters include the standard 0-127 character set as well as many extended sets for specialized purposes. For the purposes of the ray casting cmd implementation, the standard set and the 128-255 extended character set are utilized. From the standard ASCII character set the character used are  ‘ ’, ‘.’, ‘-’, ‘x’, ‘#’, ‘p’, ‘R’, ‘W’, ‘C’, ‘G’. From the extended character set the characters are u'\u2588', u'\u2593', u'\u2592', u'\u2591' (expressed in Unicode format). These characters are used for representing simulation elements on the output screen. 
+ASCII (American Standard Code for Information Interchange) Characters are encoded values for electronic communication. ASCII characters are used in text-based display terminals such as the command prompt. These characters include the standard 0-127 character set as well as many extended sets for specialized purposes. For the purposes of the ray casting cmd implementation, the standard set and the 128-255 extended character set are utilized. From the standard ASCII character set the character used are  ```‘ ’, ‘.’, ‘-’, ‘x’, ‘#’, ‘p’, ‘R’, ‘W’, ‘C’, ‘G’```. From the extended character set the characters are ```u'\u2588', u'\u2593', u'\u2592', u'\u2591'``` (expressed in Unicode format). These characters are used for representing simulation elements on the output screen. 
 
 **Font Manipulation**
 
@@ -171,7 +171,7 @@ This method involves creating the 3d environment fully with ASCII characters ren
 
 **Shading**
 
-For the ceiling objects, the space character ‘ ‘ was used as it shades in as black. For the floor objects, a combination of  ‘.’, ‘-’, ‘x’, ‘#’ characters are used. The closer a given floor object is to the player the larger of an ASCII character is used. Alternatively, the further a given floor object is to the player the smaller of an ASCII character is used. The difference in the shape of these characters helps to create the illusion of depth on the screen. For the wall characters, several ASCII extended set characters are used and exist in a Unicode format  ```u'\u2588', u'\u2593', u'\u2592', u'\u2591'```. Each character is a block shape with dots within it. For walls close to the player the fully shaded-in block character is used. For walls further away a less densely filled-in block character is used. Similar to the floor shading method, the wall shading method also helps in creating the illusion of depth on the player’s screen.
+For the ceiling objects, the space character ‘ ‘ was used as it shades in as black. For the floor objects, a combination of  ```‘.’, ‘-’, ‘x’, ‘#’``` characters are used. The closer a given floor object is to the player the larger of an ASCII character is used. Alternatively, the further a given floor object is to the player the smaller of an ASCII character is used. The difference in the shape of these characters helps to create the illusion of depth on the screen. For the wall characters, several ASCII extended set characters are used and exist in a Unicode format  ```u'\u2588', u'\u2593', u'\u2592', u'\u2591'```. Each character is a block shape with dots within it. For walls close to the player the fully shaded-in block character is used. For walls further away a less densely filled-in block character is used. Similar to the floor shading method, the wall shading method also helps in creating the illusion of depth on the player’s screen.
 
 **Boundary Lines**
 
@@ -204,7 +204,7 @@ A negative effect of this texturing approach is for each hit block three boundar
 
 **Texture Rendering**
 
-This method involves creating the 3d environment with the use of the space ‘ ‘ ASCII character and then shading in each blank space as a different color depending on if it is a ceiling, wall, or floor object. A texture mapping process is added to the screen to inform the program what color to shade in each space character during rendering. The texture mapping process returns ASCII character values ‘C‘, ‘R’, ‘W’, ‘G’. The character C represents the ceiling object and is colored in as black, R and W represent wall objects and are colored in as either red or white, and G represents the ground object and is colored in as green.
+This method involves creating the 3d environment with the use of the space ```‘ ‘``` ASCII character and then shading in each blank space as a different color depending on if it is a ceiling, wall, or floor object. A texture mapping process is added to the screen to inform the program what color to shade in each space character during rendering. The texture mapping process returns ASCII character values ```‘C‘, ‘R’, ‘W’, ‘G’```. The character C represents the ceiling object and is colored in as black, R and W represent wall objects and are colored in as either red or white, and G represents the ground object and is colored in as green.
 
 **Texture Mapping**
 
@@ -269,7 +269,7 @@ One limitation of building this project in the python programming language is sp
 
 **Hashing**
 
-The hashing method for every possible player position in the simulated map returns a string of values to be rendered to the screen. In this implementation, the string is made up of ‘C, R, W, G‘ and space ‘ ‘ characters to be converted to color at runtime.
+The hashing method for every possible player position in the simulated map returns a string of values to be rendered to the screen. In this implementation, the string is made up of ```‘C, R, W, G‘``` and space ```‘ ‘``` characters to be converted to color at runtime.
 
 **Keys**
 
