@@ -29,7 +29,7 @@ Ray Casting Hashed and Ray Casting Hashed Color require JSON files of a pre-hash
 
 **Creating Maps**
 
-Users can create maps that can be rendered with any of the above-listed methods. Maps exist as 2-dimensional arrays and consist of one ‘p’ ASCII character as well as a mix of ‘#’ characters representing walls and ‘.’ characters representing empty space.
+Users can create maps that can be rendered with any of the above-listed methods. Maps exist as 2-dimensional arrays and consist of one ```‘p’``` ASCII character as well as a mix of ```‘#’``` characters representing walls and ```‘.’``` characters representing empty space.
 
 An example of a constructed map:
 ```
