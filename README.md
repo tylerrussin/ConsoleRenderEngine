@@ -74,7 +74,7 @@ Ray Casting Classic Executable [Here](https://drive.google.com/file/d/153Kjcn8uF
 
 Ray Casting Textured Executable [Here](https://drive.google.com/file/d/1R-rmk3PQfAUNCWO82qQgjGl1lbZbg5ZQ/view?usp=sharing)
 
-# Overview of the Ray Casting Algorithm and its implementation
+# Overview of the Ray Casting Algorithm and it's implementation
 
 **The Command Prompt**
 
