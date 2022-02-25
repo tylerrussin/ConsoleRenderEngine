@@ -2,7 +2,7 @@
 
 ### Introduction
 
-Ray Casting is a lightweight technique for 3D graphical rendering that when implemented correctly creates a compelling illusion of an explorable 3d space. This project explores the concepts of ray casting and allows the user to use various methods of rendering the environment. 
+Ray Casting is a lightweight technique for 3D graphical rendering. When implemented correctly, creates a compelling illusion of an explorable 3D space. This project explores the concepts of ray casting and allows the user to use various methods of rendering the environment. 
 
 **Gallary**
 
@@ -10,22 +10,21 @@ Ray Casting is a lightweight technique for 3D graphical rendering that when impl
 
 ### Usage
 
-This codebase is built to run on Windows computers and the virtual environment requires python 3.7 to be installed.
+This codebase is built to run on Windows computers, its virtual environment requires python 3.7 to be installed.
 
 The following files:
 
-- Ray_Casting_Classic.py
-- Ray_Casting_Textured.py
-- Ray_Casting_Hashed.py
-- Ray_Casting_Hashed_color.py
+-	Ray_Casting_Classic.py
+-	Ray_Casting_Textured.py
+-	Ray_Casting_Hashed.py
+-	Ray_Casting_Hashed_color.py
 
 Are all created to demonstrate different rendering methods of the Simulation Class within the repo. All rendering methods are built on top of the same ray casting algorithm. To test each method the associated file can be run directly.
 
-There are limitations that should be noted:
-All fills use ASCII characters from the extended set and may not be available with all command prompts
-The Simulation Class uses colors when rendering text that not all command prompts support
-Ray Casting Hashed and Ray Casting Hashed Color require JSON files of a pre-hashed map of the 3d environment. The user can create these files with the Make_Hashed_Map.py file. Alternatively, several of these pre-hashed files can be downloaded below as they are too large to store on GitHub and each requires at least 8 gigabytes of memory to run. Save these files in an extracted state in the hashed_map directory of this repo.
-
+Some limitations  should be noted:
+-	All fills use ASCII characters from the extended set and may not be available with all command prompts
+-	The Simulation Class uses colors when rendering text that not all command prompts support
+-	Ray Casting Hashed and Ray Casting Hashed Color require JSON files of a pre-hashed map of the 3D environment. The user can create these files with the Make_Hashed_Map.py file. Alternatively, several of these pre-hashed files can be downloaded below as they are too large to store on GitHub and each requires at least 8 gigabytes of memory to run. Save these files in an extracted state in the hashed_map directory of this repo.
 
 **Creating Maps**
 
@@ -56,7 +55,7 @@ Player spawns in at the location of p facing the southern direction.
 
 **Hashing Maps**
 
-Once a map is constructed the maps can be hashed by running the Make_Hashed_Map.py file and specifying which map to be hashed. Depending on the size of the map hashing can take 30 minutes to several hours. Several maps have been pre-hashed and saved to a personal google drive account.
+Once a map is constructed, the maps can be hashed by running the Make_Hashed_Map.py file specifying which map to be hashed. Depending on the size of the map, hashing can take 30 minutes to several hours. Several maps have been pre-hashed and saved to a personal google drive account.
 
 Map One Hashed Download [Here](https://drive.google.com/file/d/1Ws2Q2WXOJVLGt2i_gu-BLtg3crU63zSK/view?usp=sharing)
 
@@ -64,7 +63,7 @@ Map Two Hashed Download [Here](https://drive.google.com/file/d/1BNAjFWH12K9ixtii
 
 **Creating Sprites**
 
-Sprite textures can be used to change the textures of the wall in the simulation. There is currently a designed brick wall texture. New textures can be created by making a 2-dimensional array of strings representing color information (It should be noted that structure has not yet been built in this repo to make new sprite creation user-friendly). The Simulation Class is currently wired to handle red and white colors. However, manual manipulation of these colors can be changed in the files. Please reference the [python-curses](https://docs.python.org/3/howto/curses.html) documentation for more information on coloring text in the command prompt.
+Sprite textures can be used to change the textures of the wall in the simulation. Currently, there is a designed brick wall texture. New textures can be created by making a 2-dimensional array of strings representing color information (It should be noted that structure has not yet been built in this repo to make the creation of new sprites user-friendly). The Simulation Class is currently wired to handle red and white colors. However, manual manipulation of these colors can be changed in the files. Please reference the [python-curses](https://docs.python.org/3/howto/curses.html) documentation for more information on coloring text in the command prompt.
 
 **Executables**
 
@@ -86,7 +85,7 @@ Curses is a program written in C designed to communicate with text-based display
 
 **ASCII Characters**
 
-ASCII (American Standard Code for Information Interchange) Characters are encoded values for electronic communication. ASCII characters are used in text-based display terminals such as the command prompt. These characters include the standard 0-127 character set as well as many extended sets for specialized purposes. For the purposes of the ray casting cmd implementation, the standard set and the 128-255 extended character set are utilized. From the standard ASCII character set the character used are  ‘ ’, ‘.’, ‘-’, ‘x’, ‘#’, ‘p’, ‘R’, ‘W’, ‘C’, ‘G’. From the extended character set the characters are u'\u2588', u'\u2593', u'\u2592', u'\u2591' (expressed in Unicode format). These characters are used for representing simulation elements on the output screen. 
+ASCII (American Standard Code for Information Interchange) Characters are encoded values for electronic communication. ASCII characters are used in text-based display terminals such as the command prompt. These characters include the standard 0-127 character set as well as many extended sets for specialized purposes. For the purposes of the ray casting cmd implementation, the standard set and the 128-255 extended character set are utilized. From the standard ASCII character set the character used are  ‘ ’, ‘.’, ‘-’, ‘x’, ‘#’, ‘p’, ‘R’, ‘W’, ‘C’, ‘G’. From the extended character set the characters are u'\u2588', u'\u2593', u'\u2592', u'\u2591' (expressed in Unicode format). These characters are used to represent simulation elements on the output screen. 
 
 **Font Manipulation**
 
@@ -96,50 +95,50 @@ To create a more detailed representation of the 3D simulation the cmd font sizes
 
 **Defining the Map**
 
-The simulation exists as a 2d array. The array is made up of arrays of strings representing the objects in the 3d space. The characters used in the 2d array are ‘p’ for player location, ‘#’ for wall location, ‘.’ for empty space. In this space, each character is defined as a one-by-one unit square. The implemented map is a 16 by 16 2d array. 
+The simulation exists as a 2D array. The array is made up of arrays of strings representing the objects in the 3D space. The characters used in the 2D array are ‘p’ for player location, ‘#’ for wall location, ‘.’ for empty space. In this space, each character is defined as a one-by-one unit square. The implemented map is a 16 by 16 2D array. 
 
 **Casting Rays Overview**
 
-The number of rays cast out is dependent on the screen width. Each ray shot in the 2d map array space will translate to one column in the screen display array. The distance it takes each ray to reach a wall describes how many rows of each column are filled in with ceiling vs wall vs floor characters. The distance also has an effect on the shaded wall character used in the rendered screen.
+The number of rays cast out depends on the screen width. Each ray shot in the 2D map array space will translate to one column in the screen display array. The distance it takes each ray to reach a wall describes how many rows of each column are filled in with ceiling vs. wall vs. floor characters. The distance also has an effect on the shaded wall character used in the rendered screen.
 
 **Field of View**
 
-The field of view is defined in this implementation as how much of the two divided by pi radian space around the player will be displayed in the scene. Pi divided by four (making up one eighth of the total visual space information) will be the player’s seen field of view. 
+The field of view is defined in this implementation as how much of the two divided by pi radian space around the player will be displayed in the scene. Pi divided by four (making up one-eighth of the total visual space information) will be the player’s seen field of view. 
 
 **<img src="https://render.githubusercontent.com/render/math?math=FOV = \frac{\pi}{4.0}">**
 
 **Ray Angle**
 
-For each ray in the width of the screen, there is an associated angle that the ray is shooting out at in the 2d map array space. The goal is to have several rays (one for each column in the screen width) whose angles lay within the player’s field of view. This angle is calculated by taking the player’s current angle and subtracting half the field of view. We then add the current column divided by the width of the screen times the player’s field of view. The result is a ray with an angle that aligns with a given column slot within the player’s field of view.
+For each ray in the width of the screen, there is an associated angle that the ray is shooting out at in the map array space. The goal is to have several rays (one for each column in the screen width) whose angles lay within the player’s field of view. This angle is calculated by taking the player’s current angle and subtracting half the field of view. We then add the current column divided by the width of the screen times the player’s field of view. The result is a ray with an angle that aligns with a given column slot within the player’s field of view.
 
 **<img src="https://render.githubusercontent.com/render/math?math=RayAngle\theta = (PlayerAngle\theta - \frac{FOV}{2}) %2B \frac{ScreenColumn}{ScreenWidth} \times FOV">**
 
 **Unit Vector**
 
-To begin the process of solving the distance from the player to the wall a unit vector is calculated for each ray angle in the screen width. The vector is calculated by taking the sine() and cosine() of the ray angle
+To begin the process of solving the distance from the player to the wall, a unit vector is calculated for each ray angle in the screen width. The vector is calculated by taking the sine() and cosine() of the ray angle
 
 **<img src="https://render.githubusercontent.com/render/math?math=\vec{X} = cos(RayAngle\theta)">**
 
 **<img src="https://render.githubusercontent.com/render/math?math=\vec{Y} = sin(RayAngle\theta)">**
 
-The importance of the unit vector is it translates or current ray angle into a scalable direction with a length.
+The importance of the unit vector is it translates the current ray angle into a scalable direction with a length.
 
 **Distance to the Wall**
 
-To calculate the distance of each ray (from player to a wall) a step size variable is used. For each iteration until a wall is hit the step size is added to the current distance traveled. This value then becomes a scaler that is multiplied by the unit vector. The origin of the vector is set by adding the scaled vector to the player’s x and y coordinates.
+To calculate the distance of each ray (from the player to a wall), a step size variable is used. For each iteration, the step size is added to the current distance traveled until a wall is hit. This value then becomes a scalar that is multiplied by the unit vector. The origin of the vector is set by adding the scaled vector to the player’s x and y coordinates.
 
 **<img src="https://render.githubusercontent.com/render/math?math=\vec{PlayerX} = PlayerX %2B \vec{X} \times CurrentDistance">**
 
 **<img src="https://render.githubusercontent.com/render/math?math=\vec{PlayerY} = PlayerY %2B \vec{Y} \times CurrentDistance">**
 
 
-The test_x(PlayerX Vector) and test_y(PlayerY Vector) floating-point numbers are then converted to integers and are used as index positions in the 2d map array. If the current value at the given indices is equal to ‘.’ the ray currently exists in an empty space. However, if the current value at the given indices is equal to ‘#’ this represents a wall in 2d map array space and a boolean flag is raised.
+The test_x(PlayerX Vector) and test_y(PlayerY Vector) floating-point numbers are then converted to integers and are used as index positions in the 2D map array. If the current value at the given indices is equal to ‘.’ the ray currently exists in an empty space. However, if the current value at the given indices is equal to ‘#’, it represents a wall in 2D map array space and a boolean flag is raised.
 
-To avoid infinite rays being cast out into empty space a max depth variable is set limiting the max distance a ray can travel without intercepting a block space.
+To avoid infinite rays being cast out into empty space, a max depth variable is set limiting the max distance a ray can travel without intercepting a block space.
 
 **Vertical Calculations**
 
-After the ray has been cast and the distance to the wall has been calculated. The goal then becomes to fill in each row of a given column with text-based information representing the ceiling, wall, and floor. The y-coordinate space runs from the top to the bottom of our screen display array. 0 represents the first row and the screen display array height - 1 represents the last row. 
+After the ray has been cast and the distance to the wall has been calculated, the goal then becomes to fill in each row of a given column with text-based information representing the ceiling, wall, and floor. The y-coordinate space runs from the top to the bottom of our screen display array. 0 represents the first row and the screen display array height. (start a new sentence, rn it looks like negative 1) 1 represents the last row. 
 
 **The Ceiling**
 
@@ -159,15 +158,15 @@ All rows after the floor index will be filled with floor text-based characters.
 
 **The Wall**
 
-The wall is all index positions of the screen display array that exist between the ceiling stop index and the floor start index.
+The wall is all index positions that exist between the ceiling stop index and the floor start index within the screen display.
 
 ### Rendering
 
-The Project is designed to render scenes in three distinct ways. Each method represents a milestone achieved in the project. For the purposes of demonstration as progress was made with the simulation the previous rendering techniques were kept despite them becoming obsolete. The methods of rendering are **classic**, **textured**, and **hashed** each accomplishing specific goals based on the current knowledge and resources had at the time.
+The Project is designed to render scenes in three distinct ways. Each method represents a milestone achieved in the project. For the purposes of demonstration, as progress was made with the simulation the previous rendering techniques were kept despite them becoming obsolete. The methods of rendering are **classic**, **textured**, and **hashed**, each accomplishing specific goals based on the current knowledge and resources at the time.
 
 **Classic Rendering**
 
-This method involves creating the 3d environment fully with ASCII characters rendered in with the default command prompt color of white text and a black background. With this color limitation, the strategy became to use different ASCII characters of different sizes to create shading effects that reflected depth in the simulation. The classic rendering method also makes use of a boundary line texturing technique that fixes several visual issues.
+This method involves creating the 3D environment fully with ASCII characters rendered using the default command prompt color of white text and a black background. With this color limitation, the strategy became to use different ASCII characters of different sizes to create shading effects that reflected depth in the simulation. The classic rendering method also makes use of a boundary line texturing technique that fixes several visual issues.
 
 **Shading**
 
@@ -175,7 +174,7 @@ For the ceiling objects, the space character ‘ ‘ was used as it shades in as
 
 **Boundary Lines**
 
-The 3d simulation is able to project the ceiling, wall, and floor. To remove the visual issue of not being able to distinguish each wall cell from one another in the 3d space a boundary line texture is added to the walls. The difficulty of adding boundary lines is each ray cast out only has information on if it has intercepted a block or not (boolean flag). There is no intelligent communication between rays. The purposed solution is a manipulation of the current hit block corners and their relation to the current cast ray that has intersected the wall.
+The 3D simulation is able to project the ceiling, wall, and floor. To remove the visual issue of not being able to distinguish each wall cell from one another in the 3D space a boundary line texture is added to the walls. The difficulty with adding boundary lines is that each ray cast out only returns information if it has intercepted a block or not (boolean flag). There is no intelligent communication between rays. The proposed solution is a manipulation of the current hit block corners and their relation to the current cast ray that has intersected the wall.
 
 Firstly, a vector is created for each corner of a hit block back to the player. This is done by taking the current ray vector adding the current corner of the block minus the player’s coordinate.
 
@@ -188,57 +187,57 @@ For each of these new vectors, a magnitude is set so that the vector’s length 
 
 **<img src="https://render.githubusercontent.com/render/math?math=Magnitude = \sqrt{\vec{CornerX} \times \vec{CornerX} %2B \vec{CornerY} \times \vec{CornerY}}">**
 
-Secondly, the dot product is calculated for the unit vector of the current ray cast out and for each of the corners unit vectors just created.
+Secondly, the dot product is calculated for the unit vector of the current ray cast out and for each of the corner unit vectors just created.
 
 **<img src="https://render.githubusercontent.com/render/math?math=DotProduct = (\vec{X} \times \vec{CornerX} \div Magnitude) %2B (\vec{Y} \times \vec{CornerY} \div Magnitude)">**
 
 Lastly, each corner vector and dot product pair are sorted in order by distance (corner vector’s magnitude) from the corner to the player.
 
-In the given 3d environment only three corners of a block can be seen at once due to perspective. The first three closest corners of the block will be used for boundary texturing. By taking the inverse cosine of the dot product a new angle is created that represents the angle between the current cast out ray and the corner to player ray. A boundary angle size limit is set ahead of time. If the new angle in question is smaller than the predetermined boundary angle size limit the current cast out ray is flagged as a boundary ray and will be textured accordingly. This process is repeated for each of the three closest corners to the player of the hit block.
+In the given 3D environment, perspective allows for only three corners of a block to be seen at once. The first three closest corners of the block will be used for boundary texturing. By taking the inverse cosine of the dot product a new angle is created that represents the angle between the current cast out ray and the corner to player ray. A boundary angle size limit is set ahead of time. If the new angle in question is smaller than the predetermined boundary angle size limit the current cast out ray is flagged as a boundary ray and will be textured accordingly. This process is repeated for each of the three closest corners to the player of the hit block.
 
 **<img src="https://render.githubusercontent.com/render/math?math=Angle\theta = cos^{-1}(DotProduct)">**
 
 **If angle < 0.05 #(boundary angle limit size) it is a boundary**
 
-A negative effect of this texturing approach is for each hit block three boundary lines will always be textured in. If a player is only facing one side of a block the third boundary line will be shaded in appearing through the face of the wall affecting the quality of the simulation.
+A negative effect of this texturing approach is that for each hit block three boundary lines will always be textured in. If a player is only facing one side of a block the third boundary line will be shaded in appearing through the face of the wall affecting the quality of the simulation.
 
 **Texture Rendering**
 
-This method involves creating the 3d environment with the use of the space ‘ ‘ ASCII character and then shading in each blank space as a different color depending on if it is a ceiling, wall, or floor object. A texture mapping process is added to the screen to inform the program what color to shade in each space character during rendering. The texture mapping process returns ASCII character values ‘C‘, ‘R’, ‘W’, ‘G’. The character C represents the ceiling object and is colored in as black, R and W represent wall objects and are colored in as either red or white, and G represents the ground object and is colored in as green.
+This method involves creating the 3D environment with the use of the space ‘ ‘ ASCII character and then shading in each blank space as a different color depending on if it is a ceiling, wall, or floor object. A texture mapping process is added to the screen to inform the program what color to shade in each space character during rendering. The texture mapping process returns ASCII character values ‘C‘, ‘R’, ‘W’, ‘G’. The character C represents the ceiling object and is colored in as black, R and W represent wall objects and are colored in as either red or white, and G represents the ground object and is colored in as green.
 
 **Texture Mapping**
 
-The 3d space visualizes the ceiling, wall, and floor. The results of this are compelling, but the rendered wall is in greyscale and is lacking any sort of detail. The mapping of textures on wall objects in the simulation provides a more vibrant and immersive experience. To accomplish this a sprite with color information needs to be created, the normalized sample coordinates x and y need to be calculated, and the sprite texture needs to be sampled for rendering.
+The 3d space visualizes the ceiling, wall, and floor. The results of this are compelling, but the rendered wall is in greyscale and lacks any sort of detail. The mapping of textures on wall objects provides a more vibrant and immersive experience in the simulation. To accomplish this, a sprite with color information needs to be created, the normalized sample coordinates x and y need to be calculated, and the sprite texture needs to be sampled for rendering.
 
 **Sprites**
 
-In this implementation, a sprite is treated as a 2-dimensional array where each value represents a color. The collection of colors in the array comes together to form an image. The sprite is designed in such a way that given an x and y index location the 2d array returns a value representing which color to shade in the current text-based pixel on the player’s screen. The sprite used in this project exists as a 32 by 32 value image.
+In this implementation, a sprite is treated as a 2-dimensional array where each value represents a color. The collection of colors in the array comes together to form an image. The sprite is designed in such a way that given an x and y index location the 2D array returns a value representing which color to shade in the current text-based pixel on the player’s screen. The sprite used in this project exists as a 32 by 32 value image.
 
 **Sampling Coordinates**
 
-A given block in the 3d simulation exists as a unit square from length zero to one. The goal is to map the 32 by 32 sized sprite to the face of a unit square in the simulation. This is done by finding a normalized coordinate x for the horizontal position of the image and a normalized coordinate y for the vertical position of the image. The x sample coordinate is found by finding the midpoint of the hit block. Finding where the current casted ray hit the wall (x, y coordinates).  Creating a vector based on the midpoint and where the ray hit the wall. Then determining which side of the block was hit (with the aid of the newfound vector) and taking the associated x or y value for that wall’s side. This value represents the normalized x position of what part of the block was hit by the casted ray. The y sample coordinate is found by returning a normalized y value relative to the known wall height in vertical space(The space between the ceiling stop index and the floor start index).
+A given block in the 3D simulation exists as a unit square from length zero to one. The goal is to map the 32 by 32 sized sprite to the face of a unit square in the simulation. This is done by finding a normalized coordinate x for the horizontal position of the image and a normalized coordinate y for the vertical position of the image. The x sample coordinate is found by finding the midpoint of the hit block. Finding where the current cast-out ray hit the wall (x, y coordinates).  Creating a vector based on the midpoint and where the ray hit the wall. Then, determining which side of the block was hit (with the aid of the newfound vector) and taking the associated x or y value for that wall’s side. This value represents the normalized x position of what part of the block was hit by the casted ray. The y sample coordinate is found by returning a normalized y value relative to the known wall height in vertical space (the space between the ceiling stop index and the floor start index).
 
 **X Sample Coordinate**
 
-Firstly, the midpoint of the hit block needs to be calculated. This is found by taking the previously found test_x(PlayerX Vector) and test_y(PlayerY Vector) variables (which are currently the index locations of a the hit block in the 2d map array) and adding 0.5 to each since each block is a unit square of 1.
+Firstly, the midpoint of the hit block needs to be calculated. This is found by taking the previously found test_x(PlayerX Vector) and test_y(PlayerY Vector) variables (which are currently the index locations of the hit block in the 2D map array) and adding 0.5 to each since each block is a unit square of 1.
 
 **<img src="https://render.githubusercontent.com/render/math?math=MidPointX = \vec{PlayerX} %2B 0.5">**
 
 **<img src="https://render.githubusercontent.com/render/math?math=MidPointY = \vec{PlayerY} %2B 0.5">**
 
-Secondly, the coordinates of where the block wall was hit need to be calculated. This is done by taking the player’s coordinates plus the ray’s unit vector times the calculated distance to the wall
+Secondly, the coordinates of where the block wall was hit need to be calculated. This is done by taking the player’s coordinates plus the ray’s unit vector times the calculated distance to the wall.
 
 **<img src="https://render.githubusercontent.com/render/math?math=HitPointX = PlayerX %2B \vec{X} \times DistanceToWall">**
 
 **<img src="https://render.githubusercontent.com/render/math?math=HitPointY = PlayerY %2B \vec{Y} \times DistanceToWall">**
 
-Lastly, the side of the hit block needs to be known. Depending on which side of the block is hit the sample x coordinate will equal either the - x, x, -y, y coordinate of where the ray hit the wall. To calculate this we can use a slightly rotated arctan 2 function that will map each quadrant of the unit block to a side.
+Lastly, the side of the hit block needs to be known. Depending on which side of the block is hit the sample x coordinate will equal either the - x, x, -y, or y coordinate of where the ray hit the wall. To calculate this we can use a slightly rotated arctan 2 function that will map each quadrant of the unit block to a side.
 
 **<img src="https://render.githubusercontent.com/render/math?math=Angle\theta = arctan^{2}((HitPointY - MidPointY), (HitPoinitX - MidPointX))">**
 
 The arctan 2 function returns a one-dimensional variable within a negative pi to positive pi radian space. The value of the test_angle(Angle theta) represents which quadrant the ray hit. The normalized sample x value is then set based on which quadrant was hit. If in quadrant pi divided by two sample x is set as test_point_y(HitPointY)(y coordinate of where the ray hit the wall) minus test_y(Y Vector)(y integer location of the wall in 2d map array space). If in quadrant pi sample x is set as test_point_x(HitPointX)(x coordinate of where the ray hit the wall) minus test_x(X Vector)(x integer location of the wall in 2d map array space). If in quadrant negative pi sample x is set as test_point_x minus test_x. If in quadrant negative pi divided by two sample x is set as test_point_y minus test_y.
 
-The resulting sample x value is a normalized horizontal coordinate that can be used for texture sampling
+The resulting sample x value is a normalized horizontal coordinate that can be used for texture sampling.
 
 **Y Sample Coordinate**
 
@@ -258,14 +257,14 @@ Given the normalized coordinates, the coefficients are removed. The remaining fl
 
 **<img src="https://render.githubusercontent.com/render/math?math=SpriteIndexY = SampleY \times SpriteHeight">**
 
-The resulting values are x and y index positions that can be used to grab a value in the 2d sprite array.
+The resulting values are x and y index positions that can be used to grab a value in the 2D sprite array.
 
-The result of the full texture mapping process is a fully mapped texture to the walls of the 3d simulation.
+The result of the full texture mapping process is a fully mapped texture to the walls of the 3D simulation.
 
 
 **Hashed Screen Rendering**
 
-One limitation of building this project in the python programming language is speed. High-level programming languages such as python are slower at computation when compared to low-level languages such as c++. Python functions fine for the classic rendering method, however with the texturing method performance is limited. The main issue is the need for more detail to get the full effect of the textures. This requires more computation and ultimately lowers the frame rate of the simulation. Computation at runtime is no longer effective and the frame rate(iteration speed) of the simulation is far too slow. The proposed solution for demonstration purposes is to do all the calculations in the simulation ahead of time and store those values so that at runtime the values can be referenced from computer memory.
+Speed is the one limitation of building this project in the python programming language. High-level programming languages such as python are slower at computation when compared to low-level languages such as C++. Python functions fine for the classic rendering method, however with the texturing method performance is limited. The main issue is the need for more detail to get the full effect of the textures. This requires more computation and ultimately lowers the frame rate of the simulation. Computation at runtime is no longer effective and the framerate (iteration speed) of the simulation is far too slow. The proposed solution for demonstration purposes is to do all the calculations in the simulation ahead of time and store those values so that at runtime the values can be referenced from computer memory.
 
 **Hashing**
 
@@ -273,7 +272,7 @@ The hashing method for every possible player position in the simulated map retur
 
 **Keys**
 
-The key to the hash is a tuple of the current position of the player in the simulation. This tuple consists of the player’s angle, y-coordinate, and x-coordinate in the 2d map array. As an optimization, the player angle is limited to four positions (0 radians, pi divided by 2 radians, pi radians, and pi plus pi divided by 2 radians) rather than the full radian space available in the classic and texture render methods. The angle limit is a compromise of limiting player mobility to reduce the time and memory needed to make the hashed map.
+The key to the hash is a tuple of the current position of the player in the simulation. This tuple consists of the player’s angle, y-coordinate, and x-coordinate in the 2D map array. As an optimization, the player angle is limited to four positions (0 radians, pi divided by 2 radians, pi radians, and pi plus pi divided by 2 radians) rather than the full radian space available in the classic and texture render methods. The angle limit is a compromise of limiting player mobility to reduce the time and memory needed to make the hashed map.
 
 **Values**
 
@@ -281,4 +280,4 @@ The returned values of the hash are strings containing texture information for e
 
 **Hashed Results**
 
-Once constructed the hashed rendering method achieves an experience that could not be observed with computation at runtime using python. However, the large JSON files that the maps are stored in are memory intensive and require storage in google drive to be downloaded before runtime rather than being stored as part of the project repo.
+Once constructed, the hashed rendering method achieves an experience that could not be observed with computation at runtime using python. However, the large JSON files that the maps are stored in are memory intensive and require storage in google drive to be downloaded before runtime rather than being stored as part of the project repo.
