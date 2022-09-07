@@ -64,12 +64,13 @@ class CubeMesh:
 class Mesh:
     '''Mesh loaded in from an obj file'''
 
+    file_name: str
     tris: List[Triangle] = None
 
-    def __post_init__(self, file):
+    def __post_init__(self):
 
         # Read in obj file
-        f = open(file, "r")
+        f = open(self.file, "r")
         lines = f.readlines()
         f.close()
 

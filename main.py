@@ -75,6 +75,7 @@ if __name__ == '__main__':
     # Initiate world classes
     camera = Vector()
     mesh = CubeMesh()
+    # mesh = Mesh('data/groot.obj')
 
     # Simulation loop
     while 1:
