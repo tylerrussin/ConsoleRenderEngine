@@ -1,26 +1,25 @@
 '''A engine to render ASCII characters to the command line'''
 
-import os
-import sys
-import curses
+# ctypes structures cause pylint no member error
+# pylint: disable=no-member
+
 from typing import List
 
-import keyboard
-
-import cmd_tools
+import  windows_console
 
 
 class ConsoleRenderEngine:
     '''
-    The ConsoleRenderEngine is a built up tool for drawing ASCII characters
-    to the command line.
+    The ConsoleRenderEngine is a tool for drawing ASCII characters
+    to the command line with the Windows Console API.
 
     Attributes:
         font_size (int): the font size of the cmd ASCII characters
         screen_width (int): the width of the cmd buffer
         screen_height (int): the height of the cmd buffer
-        screen (2DArray): matrix containing ASCII values
-        stdscr (curses obj): is manipulated to render to cmd
+        screen (list): list containing ASCII characters and attributes
+        console_output (int): std handle output to the console
+        console_window (SmallRect): a C structure defining console size
     '''
 
     def __init__(self, font_size: int, screen_width: int, screen_height: int):
@@ -37,46 +36,102 @@ class ConsoleRenderEngine:
         self.screen_width = screen_width
         self.screen_height = screen_height
 
-        self.screen: List[List[int]] = None
-        self.stdscr: curses.initscr() = None
+        self.screen: List[windows_console.CharInfo] = self.reset_screen()
+        self.console_output: int = windows_console.get_std_handle(-11)
+        self.console_window = windows_console.SmallRect(0,0,1,1)
 
-        self.__on_user_create()
+
+    def __font_info(self, font_width: int, font_height: int,
+                    family=0, weight=400, name="Consolas") -> None:
+        '''Set console font info'''
+
+        maximum_window = False
+        font_infoex = windows_console.ConsoleFontInfoex()
+        font_infoex.cbSize = windows_console.ctypes.sizeof(font_infoex)
+        font_infoex.nFont = 0
+        font_infoex.dwFontSize.X = font_width
+        font_infoex.dwFontSize.Y = font_height
+        font_infoex.FontFamily = family       # FF_DONTCARE
+        font_infoex.FontWeight = weight       # FW_NORMAL
+        font_infoex.FaceName = name
+
+        windows_console.set_current_console_fontex(self.console_output, maximum_window, font_infoex)
 
 
-    def __on_user_create(self):
+    def on_user_create(self) -> None:
+        '''Construct the windows console to specified settings'''
 
-        cmd_tools.cmd_font(self.font_size)  # Set font size
-        self.reset_screen()                 # reset screen matrix
+        # SetConsoleWindowInfo
+        windows_console.set_console_window_info(self.console_output, True, self.console_window)
 
-        # Shape cmd buffer dimentions
-        os.system(f"mode con: cols={self.screen_width*2} lines={self.screen_height}")
+        # SetConsoleScreenBufferSize
+        coord = windows_console.Coord(self.screen_width, self.screen_height)
+        windows_console.set_console_screen_buffer_size(self.console_output, coord)
 
-        self.stdscr = curses.initscr()      # Initialize curses window for cmd
+        # SetConsoleActiveScreenBuffer
+        windows_console.set_console_active_screen_buffer(self.console_output)
+
+        # Set font information in console
+        self.__font_info(self.font_size, self.font_size)
+
+        # SetConsoleCursorInfor
+        console_cursor_info = windows_console.ConsoleCursorInfo()
+        console_cursor_info.bVisible = False
+        windows_console.set_console_cursor_info(self.console_output, console_cursor_info)
+
+        # SetConsoleWindowInfo
+        self.console_window = windows_console.SmallRect(0, 0,
+                                                        self.screen_width - 1,
+                                                        self.screen_height - 1)
+
+        windows_console.set_console_window_info(self.console_output, True, self.console_window)
 
 
     def on_user_destroy(self):
-        '''Reset cmd properties'''
-        curses.endwin()                                  # End curses instance
-        os.system(f"mode con: cols={120} lines={40}")    # Reset cmd buffer
-        cmd_tools.cmd_font(16)                           # Reset default font size
+        '''Construct the windows console to default settings'''
+        original_width = 120
+        original_height = 40
+        original_font_width = 8
+        original_font_height = 16
+
+        self.console_window = windows_console.SmallRect(0,0,1,1)
+        windows_console.set_console_window_info(self.console_output, True, self.console_window)
+
+        coord = windows_console.Coord(original_width, original_height)
+        windows_console.set_console_screen_buffer_size(self.console_output, coord)
+
+        self.__font_info(original_font_width, original_font_height)
+
+        self.console_window = windows_console.SmallRect(0, 0,
+                                                        original_width - 1,
+                                                        original_height - 1)
+
+        windows_console.set_console_window_info(self.console_output, True, self.console_window)
 
 
     def reset_screen(self):
-        '''Fills screen matrix with blank ASCII characters'''
-        self.screen = [[' ' for x in range(self.screen_width)] for y in range(self.screen_height)]
+        '''Fills screen char info list with blank ASCII characters'''
+        char = windows_console.Char(' ')
+        cell_count = self.screen_width * self.screen_height
+        self.screen = [windows_console.CharInfo(char, 0) for _ in range(cell_count)]
 
 
     def display_screen(self):
-        '''Display the current screen matrix in curses window instance'''
-        self.screen[self.screen_height - 1][self.screen_width - 1] = ''
-        self.stdscr.addstr(0, 0, ''.join(ele + ele for sub in self.screen for ele in sub))
-        self.stdscr.refresh()
+        '''Draws the curent screen char info list to console buffer'''
+
+        self.screen[self.screen_width * self.screen_height - 1].Char.UnicodeChar = '\0'
+        seq = windows_console.CharInfo * len(self.screen)
+        windows_console.write_console_output_w(self.console_output, seq(*self.screen),
+                                               windows_console.Coord(self.screen_width,
+                                                                     self.screen_height),
+                                               windows_console.Coord(0,0), self.console_window)
 
 
     def __draw(self, x: int, y: int, char: str):
         # Check screen boundry
         if x < self.screen_width and y < self.screen_height:
-            self.screen[y][x] = char
+            self.screen[y * self.screen_width + x].Char.UnicodeChar = char
+            self.screen[y * self.screen_width + x].Attributes = 0x000F
 
 
     def __draw_line(self, x1: int, y1: int, x2: int, y2: int, char: str):
