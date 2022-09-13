@@ -164,7 +164,7 @@ PIXEL_HALF = '\u2592'
 PIXEL_QUARTER = '\u2591'
 
 FG_BLACK		= 0x0000
-FG_DARK_BLUE    = 0x0001	
+FG_DARK_BLUE    = 0x0001
 FG_DARK_GREEN   = 0x0002
 FG_DARK_CYAN    = 0x0003
 FG_DARK_RED     = 0x0004
@@ -278,7 +278,7 @@ if __name__ == '__main__':
     # Initiate world classes
     camera = Vector()
     mesh = CubeMesh()
-    # mesh = Mesh('data/teapot.obj')
+    mesh = Mesh('data/axis.obj')
 
     matrix_prog = MatrixMath.make_projection(90, SCREEN_HEIGHT / SCREEN_WIDTH, 0.1, 1000)
 
@@ -306,7 +306,7 @@ if __name__ == '__main__':
         mat_rot_x = MatrixMath.make_rotation_x(THETA * 0.5)
 
         # Correct distance to see cube
-        mat_trans = MatrixMath.make_translation(0, 0, 3)
+        mat_trans = MatrixMath.make_translation(0, 0, 16)
 
         mat_world = MatrixMath.make_identity()    # Form World Matrix
         mat_world = MatrixMath.multiply_matrix(mat_rot_z, mat_rot_x) # Transform by rotation
