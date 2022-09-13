@@ -41,7 +41,7 @@ class VectorMath:
     @staticmethod
     def length(vec_1: Vector) -> int:
         '''Calculate and return a vector length'''
-        return VectorMath.dot_product(vec_1, vec_1)
+        return math.sqrt(VectorMath.dot_product(vec_1, vec_1))
 
     @staticmethod
     def normalize(vec_1: Vector) -> Vector:
@@ -158,17 +158,107 @@ class MatrixMath:
         return mat
 
 
+PIXEL_SOLID = '\u2588'
+PIXEL_THREEQUARTERS = '\u2593'
+PIXEL_HALF = '\u2592'
+PIXEL_QUARTER = '\u2591'
+
+FG_BLACK		= 0x0000
+FG_DARK_BLUE    = 0x0001	
+FG_DARK_GREEN   = 0x0002
+FG_DARK_CYAN    = 0x0003
+FG_DARK_RED     = 0x0004
+FG_DARK_MAGENTA = 0x0005
+FG_DARK_YELLOW  = 0x0006
+FG_GREY			= 0x0007
+FG_DARK_GREY    = 0x0008
+FG_BLUE			= 0x0009
+FG_GREEN		= 0x000A
+FG_CYAN			= 0x000B
+FG_RED			= 0x000C
+FG_MAGENTA		= 0x000D
+FG_YELLOW		= 0x000E
+FG_WHITE		= 0x000F
+BG_BLACK		= 0x0000
+BG_DARK_BLUE	= 0x0010
+BG_DARK_GREEN	= 0x0020
+BG_DARK_CYAN	= 0x0030
+BG_DARK_RED		= 0x0040
+BG_DARK_MAGENTA = 0x0050
+BG_DARK_YELLOW	= 0x0060
+BG_GREY			= 0x0070
+BG_DARK_GREY	= 0x0080
+BG_BLUE			= 0x0090
+BG_GREEN		= 0x00A0
+BG_CYAN			= 0x00B0
+BG_RED			= 0x00C0
+BG_MAGENTA		= 0x00D0
+BG_YELLOW		= 0x00E0
+BG_WHITE		= 0x00F0
+
 def get_color(lum):
     '''Converts an illumaned value to greyscale ASCII'''
-    pixel_bw = int(4 * lum)
+    pixel_bw = int(13 * lum)
+
     if pixel_bw == 0:
-        return '\u2591'
-    if pixel_bw == 1:
-        return '\u2592'
-    if pixel_bw == 2:
-        return '\u2593'
+        bg_col = BG_BLACK 
+        fg_col = FG_BLACK
+        sym = PIXEL_SOLID
+    elif pixel_bw == 1:
+        bg_col = BG_BLACK 
+        fg_col = FG_DARK_GREY
+        sym = PIXEL_QUARTER
+    elif pixel_bw == 2:
+        bg_col = BG_BLACK 
+        fg_col = FG_DARK_GREY
+        sym = PIXEL_HALF
+    elif pixel_bw == 3:
+        bg_col = BG_BLACK 
+        fg_col = FG_DARK_GREY
+        sym = PIXEL_THREEQUARTERS
+    elif pixel_bw == 4:
+        bg_col = BG_BLACK 
+        fg_col = FG_DARK_GREY
+        sym = PIXEL_SOLID
+    elif pixel_bw == 5:
+        bg_col = BG_DARK_GREY 
+        fg_col = FG_GREY
+        sym = PIXEL_QUARTER
+    elif pixel_bw == 6:
+        bg_col = BG_DARK_GREY 
+        fg_col = FG_GREY
+        sym = PIXEL_HALF
+    elif pixel_bw == 7:
+        bg_col = BG_DARK_GREY 
+        fg_col = FG_GREY
+        sym = PIXEL_THREEQUARTERS
+    elif pixel_bw == 8:
+        bg_col = BG_DARK_GREY 
+        fg_col = FG_GREY
+        sym = PIXEL_SOLID
+    elif pixel_bw == 9:
+        bg_col = BG_GREY 
+        fg_col = FG_WHITE
+        sym = PIXEL_QUARTER
+    elif pixel_bw == 10:
+        bg_col = BG_GREY 
+        fg_col = FG_WHITE
+        sym = PIXEL_HALF
+    elif pixel_bw == 11:
+        bg_col = BG_GREY 
+        fg_col = FG_WHITE
+        sym = PIXEL_THREEQUARTERS
+    elif pixel_bw == 12:
+        bg_col = BG_GREY 
+        fg_col = FG_WHITE
+        sym = PIXEL_SOLID
     else:
-        return '\u2588'
+        bg_col = BG_BLACK 
+        fg_col = FG_BLACK
+        sym = PIXEL_SOLID
+
+    return [bg_col, fg_col], sym
+
 
 
 if __name__ == '__main__':
@@ -188,7 +278,7 @@ if __name__ == '__main__':
     # Initiate world classes
     camera = Vector()
     mesh = CubeMesh()
-    mesh = Mesh('data/teapot.obj')
+    # mesh = Mesh('data/teapot.obj')
 
     matrix_prog = MatrixMath.make_projection(90, SCREEN_HEIGHT / SCREEN_WIDTH, 0.1, 1000)
 
@@ -216,7 +306,7 @@ if __name__ == '__main__':
         mat_rot_x = MatrixMath.make_rotation_x(THETA * 0.5)
 
         # Correct distance to see cube
-        mat_trans = MatrixMath.make_translation(0, 0, 5)
+        mat_trans = MatrixMath.make_translation(0, 0, 3)
 
         mat_world = MatrixMath.make_identity()    # Form World Matrix
         mat_world = MatrixMath.multiply_matrix(mat_rot_z, mat_rot_x) # Transform by rotation
@@ -266,13 +356,16 @@ if __name__ == '__main__':
                 dp = max(0.1, VectorMath.dot_product(light_direction, normal))
 
                 # Set symbol in triangle
-                tri_transformed.char = get_color(dp)
+                col, sym = get_color(dp)
+                tri_transformed.col = col
+                tri_transformed.sym = sym
 
                 # Project triangles from 3D -> 2D
                 tri_projected.vec_1 = VectorMath.multiply_matrix_vector(matrix_prog, tri_transformed.vec_1)
                 tri_projected.vec_2 = VectorMath.multiply_matrix_vector(matrix_prog, tri_transformed.vec_2)
                 tri_projected.vec_3 = VectorMath.multiply_matrix_vector(matrix_prog, tri_transformed.vec_3)
-                tri_projected.char = tri_transformed.char
+                tri_projected.sym = tri_transformed.sym
+                tri_projected.col = tri_transformed.col
 
                 # Normilize
                 tri_projected.vec_1 = VectorMath.divide(tri_projected.vec_1, tri_projected.vec_1.w)
@@ -303,7 +396,7 @@ if __name__ == '__main__':
             cmd_engine.fill_triangle(int(tri_projected.vec_1.x), int(tri_projected.vec_1.y),
                                     int(tri_projected.vec_2.x), int(tri_projected.vec_2.y),
                                     int(tri_projected.vec_3.x), int(tri_projected.vec_3.y),
-                                    tri_projected.char)
+                                    tri_projected.sym, tri_projected.col)
 
             # # Draw wireframe lines to cmd engine screen
             # cmd_engine.draw_triangle(int(tri_projected.vec_1.x), int(tri_projected.vec_1.y),

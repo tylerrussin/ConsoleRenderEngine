@@ -127,14 +127,14 @@ class ConsoleRenderEngine:
                                                windows_console.Coord(0,0), self.console_window)
 
 
-    def __draw(self, x: int, y: int, char: str):
+    def __draw(self, x: int, y: int, char: str, col: str):
         # Check screen boundry
         if x < self.screen_width and y < self.screen_height:
             self.screen[y * self.screen_width + x].Char.UnicodeChar = char
-            self.screen[y * self.screen_width + x].Attributes = 0x000F
+            self.screen[y * self.screen_width + x].Attributes = col[0] | col[1]
 
 
-    def __draw_line(self, x1: int, y1: int, x2: int, y2: int, char: str):
+    def __draw_line(self, x1: int, y1: int, x2: int, y2: int, char: str, col: str):
         dx = x2 - x1
         dy = y2 - y1
         dx1 = abs(dx)
@@ -152,7 +152,7 @@ class ConsoleRenderEngine:
                 x = x2
                 y = y2
                 xe = x1
-            self.__draw(x, y, char)
+            self.__draw(x, y, char, col)
             for _ in range(x, xe):
                 x += 1
                 if px < 0:
@@ -165,7 +165,7 @@ class ConsoleRenderEngine:
                     else:
                         y = y - 1
                     px = px + 2 * (dy1 - dx1)
-                self.__draw(x, y, char)
+                self.__draw(x, y, char, col)
 
         else:
             if dy >= 0:
@@ -177,7 +177,7 @@ class ConsoleRenderEngine:
                 x = x2
                 y = y2
                 ye = y1
-            self.__draw(x, y, char)
+            self.__draw(x, y, char, col)
             for _ in range(y, ye):
                 y += 1
                 if py <= 0:
@@ -190,22 +190,22 @@ class ConsoleRenderEngine:
                     else:
                         x = x - 1
                     py = py + 2 * (dx1 - dy1)
-                self.__draw(x, y, char)
+                self.__draw(x, y, char, col)
 
 
-    def draw_triangle(self, x1: int, y1: int, x2: int, y2: int, x3: int, y3: int, char: str):
+    def draw_triangle(self, x1: int, y1: int, x2: int, y2: int, x3: int, y3: int, char: str, col: str):
         '''Draws tringle lines to screen based on coordinates'''
-        self.__draw_line(x1, y1, x2, y2, char)
-        self.__draw_line(x2, y2, x3, y3, char)
-        self.__draw_line(x3, y3, x1, y1, char)
+        self.__draw_line(x1, y1, x2, y2, char, col)
+        self.__draw_line(x2, y2, x3, y3, char, col)
+        self.__draw_line(x3, y3, x1, y1, char, col)
 
 
-    def __fill_line(self, sx: int, ex: int, ny: int, char: str):
+    def __fill_line(self, sx: int, ex: int, ny: int, char: str, col: str):
         for i in range(sx, ex+1):
-            self.__draw(i,ny, char)
+            self.__draw(i,ny, char, col)
 
 
-    def fill_triangle(self, x1: int, y1: int, x2: int, y2: int, x3: int, y3: int, char: str):
+    def fill_triangle(self, x1: int, y1: int, x2: int, y2: int, x3: int, y3: int, char: str, col: str):
         '''Fills tringle in based on coordinates'''
         changed1 = False
         changed2 = False
@@ -322,7 +322,7 @@ class ConsoleRenderEngine:
                     maxx = t2x
 
                 # Draw line from min to max points found on the y
-                self.__fill_line(minx, maxx, y, char)
+                self.__fill_line(minx, maxx, y, char, col)
 
                 # Now increase y
                 if not changed1:
@@ -422,7 +422,7 @@ class ConsoleRenderEngine:
             if maxx < t2x:
                 maxx = t2x
 
-            self.__fill_line(minx, maxx, y, char)
+            self.__fill_line(minx, maxx, y, char, col)
             if not changed1:
                 t1x += signx1
             t1x += t1xp

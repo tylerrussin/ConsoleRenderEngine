@@ -20,7 +20,8 @@ class Triangle:
     vec_1: Vector
     vec_2: Vector
     vec_3: Vector
-    char: str = ' '
+    sym: str = ''
+    col: str = ''
 
 @dataclass
 class ProjectionMatrix:
