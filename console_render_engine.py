@@ -74,10 +74,10 @@ class ConsoleRenderEngine:
         # Set font information in console
         self.__font_info(self.font_size, self.font_size)
 
-        # SetConsoleCursorInfor
-        console_cursor_info = windows_console.ConsoleCursorInfo()
-        console_cursor_info.bVisible = False
-        windows_console.set_console_cursor_info(self.console_output, console_cursor_info)
+        # # SetConsoleCursorInfor
+        # console_cursor_info = windows_console.ConsoleCursorInfo()
+        # console_cursor_info.bVisible = False
+        # windows_console.set_console_cursor_info(self.console_output, console_cursor_info)
 
         # SetConsoleWindowInfo
         self.console_window = windows_console.SmallRect(0, 0,
@@ -129,7 +129,7 @@ class ConsoleRenderEngine:
 
     def __draw(self, x: int, y: int, char: str, col: str):
         # Check screen boundry
-        if x < self.screen_width and y < self.screen_height:
+        if x < self.screen_width and x >= 0 and y < self.screen_height and y >= 0:
             self.screen[y * self.screen_width + x].Char.UnicodeChar = char
             self.screen[y * self.screen_width + x].Attributes = col[0] | col[1]
 
