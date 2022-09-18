@@ -1,3 +1,5 @@
+'''Sprite of a wall to be sampled on to wall objects'''
+
 matrix = []
 matrix.append(list('RRRWRRRRRRRWRRRRRRRWRRRRRRRWRRRR'))
 matrix.append(list('RRRWRRRRRRRWRRRRRRRWRRRRRRRWRRRR'))
@@ -31,6 +33,3 @@ matrix.append(list('RRRRRRRWRRRRRRRWRRRRRRRWRRRRRRRW'))
 matrix.append(list('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW'))
 matrix.append(list('RRRWRRRRRRRWRRRRRRRWRRRRRRRWRRRR'))
 matrix.append(list('RRRWRRRRRRRWRRRRRRRWRRRRRRRWRRRR'))
-
-color_to_glyph = {'R': u'\u2593',
-                  'W': u'\u2591' }

@@ -60,6 +60,16 @@ class ConsoleFontInfoex(ctypes.Structure):
 
 # Windows Console API Functions
 
+def set_console_title_w(console_title: ctypes.c_wchar) -> None:
+    '''
+    Sets the title of the console
+    '''
+
+    if not ctypes.windll.kernel32.SetConsoleTitleW(console_title):
+        print('Error with SetConsoleTitleW')
+        raise WindowsConsoleException()
+
+
 def get_std_handle(std_handle: ctypes.c_ulong) -> int:
     '''
     Retrieves a standard output, standard input, or standarderror handle
@@ -116,11 +126,3 @@ def write_console_output_w(console_output: ctypes.c_void_p, buffer: CharInfo,
     '''
     ctypes.windll.kernel32.WriteConsoleOutputW(console_output, buffer, buffer_size,
                                                 buffer_coord, ctypes.byref(write_region))
-
-
-def set_console_cursor_info(console_output: ctypes.c_void_p,
-                            console_cursor_info: ConsoleCursorInfo) -> None:
-    '''
-    Sets the size and visibility of the cursor for the specified console screen buffer
-    '''
-    ctypes.windll.kernel32.SetConsoleCursorInfo(console_output, ctypes.byref(console_cursor_info))

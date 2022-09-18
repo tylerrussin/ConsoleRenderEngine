@@ -1,11 +1,5 @@
 '''A engine to render ASCII characters to the command line'''
-
-# ctypes structures cause pylint no member error
-# pylint: disable=no-member
-
-from typing import List
-
-import  windows_console
+import windows_console
 
 
 class ConsoleRenderEngine:
@@ -22,6 +16,110 @@ class ConsoleRenderEngine:
         console_window (SmallRect): a C structure defining console size
     '''
 
+    # Windows console symbols
+    PIXEL_SOLID = '\u2588'
+    PIXEL_THREEQUARTERS = '\u2593'
+    PIXEL_HALF = '\u2592'
+    PIXEL_QUARTER = '\u2591'
+
+    # Windows console colors
+    FG_BLACK		= 0x0000
+    FG_DARK_BLUE    = 0x0001
+    FG_DARK_GREEN   = 0x0002
+    FG_DARK_CYAN    = 0x0003
+    FG_DARK_RED     = 0x0004
+    FG_DARK_MAGENTA = 0x0005
+    FG_DARK_YELLOW  = 0x0006
+    FG_GREY			= 0x0007
+    FG_DARK_GREY    = 0x0008
+    FG_BLUE			= 0x0009
+    FG_GREEN		= 0x000A
+    FG_CYAN			= 0x000B
+    FG_RED			= 0x000C
+    FG_MAGENTA		= 0x000D
+    FG_YELLOW		= 0x000E
+    FG_WHITE		= 0x000F
+    BG_BLACK		= 0x0000
+    BG_DARK_BLUE	= 0x0010
+    BG_DARK_GREEN	= 0x0020
+    BG_DARK_CYAN	= 0x0030
+    BG_DARK_RED		= 0x0040
+    BG_DARK_MAGENTA = 0x0050
+    BG_DARK_YELLOW	= 0x0060
+    BG_GREY			= 0x0070
+    BG_DARK_GREY	= 0x0080
+    BG_BLUE			= 0x0090
+    BG_GREEN		= 0x00A0
+    BG_CYAN			= 0x00B0
+    BG_RED			= 0x00C0
+    BG_MAGENTA		= 0x00D0
+    BG_YELLOW		= 0x00E0
+    BG_WHITE		= 0x00F0
+
+    @classmethod
+    def get_shaded_color(cls, lum):
+        '''Converts an illumaned value to greyscale ASCII'''
+        pixel_bw = int(13 * lum)
+
+        if pixel_bw == 0:
+            bg_col = cls.BG_BLACK
+            fg_col = cls.FG_BLACK
+            sym = cls.PIXEL_SOLID
+        elif pixel_bw == 1:
+            bg_col = cls.BG_BLACK
+            fg_col = cls.FG_DARK_GREY
+            sym = cls.PIXEL_QUARTER
+        elif pixel_bw == 2:
+            bg_col = cls.BG_BLACK
+            fg_col = cls.FG_DARK_GREY
+            sym = cls.PIXEL_HALF
+        elif pixel_bw == 3:
+            bg_col = cls.BG_BLACK
+            fg_col = cls.FG_DARK_GREY
+            sym = cls.PIXEL_THREEQUARTERS
+        elif pixel_bw == 4:
+            bg_col = cls.BG_BLACK
+            fg_col = cls.FG_DARK_GREY
+            sym = cls.PIXEL_SOLID
+        elif pixel_bw == 5:
+            bg_col = cls.BG_DARK_GREY
+            fg_col = cls.FG_GREY
+            sym = cls.PIXEL_QUARTER
+        elif pixel_bw == 6:
+            bg_col = cls.BG_DARK_GREY
+            fg_col = cls.FG_GREY
+            sym = cls.PIXEL_HALF
+        elif pixel_bw == 7:
+            bg_col = cls.BG_DARK_GREY
+            fg_col = cls.FG_GREY
+            sym = cls.PIXEL_THREEQUARTERS
+        elif pixel_bw == 8:
+            bg_col = cls.BG_DARK_GREY
+            fg_col = cls.FG_GREY
+            sym = cls.PIXEL_SOLID
+        elif pixel_bw == 9:
+            bg_col = cls.BG_GREY
+            fg_col = cls.FG_WHITE
+            sym = cls.PIXEL_QUARTER
+        elif pixel_bw == 10:
+            bg_col = cls.BG_GREY
+            fg_col = cls.FG_WHITE
+            sym = cls.PIXEL_HALF
+        elif pixel_bw == 11:
+            bg_col = cls.BG_GREY
+            fg_col = cls.FG_WHITE
+            sym = cls.PIXEL_THREEQUARTERS
+        elif pixel_bw == 12:
+            bg_col = cls.BG_GREY
+            fg_col = cls.FG_WHITE
+            sym = cls.PIXEL_SOLID
+        else:
+            bg_col = cls.BG_BLACK
+            fg_col = cls.FG_BLACK
+            sym = cls.PIXEL_SOLID
+
+        return [bg_col, fg_col], sym
+
     def __init__(self, font_size: int, screen_width: int, screen_height: int):
         """
         The constructor for ConsoleRenderEngine.
@@ -36,7 +134,7 @@ class ConsoleRenderEngine:
         self.screen_width = screen_width
         self.screen_height = screen_height
 
-        self.screen: List[windows_console.CharInfo] = self.reset_screen()
+        self.screen: list[windows_console.CharInfo] = self.reset_screen()
         self.console_output: int = windows_console.get_std_handle(-11)
         self.console_window = windows_console.SmallRect(0,0,1,1)
 
@@ -74,17 +172,14 @@ class ConsoleRenderEngine:
         # Set font information in console
         self.__font_info(self.font_size, self.font_size)
 
-        # # SetConsoleCursorInfor
-        # console_cursor_info = windows_console.ConsoleCursorInfo()
-        # console_cursor_info.bVisible = False
-        # windows_console.set_console_cursor_info(self.console_output, console_cursor_info)
-
         # SetConsoleWindowInfo
         self.console_window = windows_console.SmallRect(0, 0,
                                                         self.screen_width - 1,
                                                         self.screen_height - 1)
 
         windows_console.set_console_window_info(self.console_output, True, self.console_window)
+
+        self.reset_title('Console Created!')
 
 
     def on_user_destroy(self):
@@ -108,6 +203,10 @@ class ConsoleRenderEngine:
 
         windows_console.set_console_window_info(self.console_output, True, self.console_window)
 
+    def reset_title(self, console_title):
+        '''Set the title of the console to be displayed'''
+        windows_console.set_console_title_w(console_title)
+
 
     def reset_screen(self):
         '''Fills screen char info list with blank ASCII characters'''
@@ -127,14 +226,14 @@ class ConsoleRenderEngine:
                                                windows_console.Coord(0,0), self.console_window)
 
 
-    def __draw(self, x: int, y: int, char: str, col: str):
+    def draw(self, x: int, y: int, char: str, col: list):
         # Check screen boundry
         if x < self.screen_width and x >= 0 and y < self.screen_height and y >= 0:
             self.screen[y * self.screen_width + x].Char.UnicodeChar = char
             self.screen[y * self.screen_width + x].Attributes = col[0] | col[1]
 
 
-    def __draw_line(self, x1: int, y1: int, x2: int, y2: int, char: str, col: str):
+    def draw_line(self, x1: int, y1: int, x2: int, y2: int, char: str, col: list):
         dx = x2 - x1
         dy = y2 - y1
         dx1 = abs(dx)
@@ -152,7 +251,7 @@ class ConsoleRenderEngine:
                 x = x2
                 y = y2
                 xe = x1
-            self.__draw(x, y, char, col)
+            self.draw(x, y, char, col)
             for _ in range(x, xe):
                 x += 1
                 if px < 0:
@@ -165,7 +264,7 @@ class ConsoleRenderEngine:
                     else:
                         y = y - 1
                     px = px + 2 * (dy1 - dx1)
-                self.__draw(x, y, char, col)
+                self.draw(x, y, char, col)
 
         else:
             if dy >= 0:
@@ -177,7 +276,7 @@ class ConsoleRenderEngine:
                 x = x2
                 y = y2
                 ye = y1
-            self.__draw(x, y, char, col)
+            self.draw(x, y, char, col)
             for _ in range(y, ye):
                 y += 1
                 if py <= 0:
@@ -190,22 +289,22 @@ class ConsoleRenderEngine:
                     else:
                         x = x - 1
                     py = py + 2 * (dx1 - dy1)
-                self.__draw(x, y, char, col)
+                self.draw(x, y, char, col)
 
 
-    def draw_triangle(self, x1: int, y1: int, x2: int, y2: int, x3: int, y3: int, char: str, col: str):
+    def draw_triangle(self, x1: int, y1: int, x2: int, y2: int, x3: int, y3: int, char: str, col: list):
         '''Draws tringle lines to screen based on coordinates'''
-        self.__draw_line(x1, y1, x2, y2, char, col)
-        self.__draw_line(x2, y2, x3, y3, char, col)
-        self.__draw_line(x3, y3, x1, y1, char, col)
+        self.draw_line(x1, y1, x2, y2, char, col)
+        self.draw_line(x2, y2, x3, y3, char, col)
+        self.draw_line(x3, y3, x1, y1, char, col)
 
 
-    def __fill_line(self, sx: int, ex: int, ny: int, char: str, col: str):
+    def __fill_line(self, sx: int, ex: int, ny: int, char: str, col: list):
         for i in range(sx, ex+1):
-            self.__draw(i,ny, char, col)
+            self.draw(i,ny, char, col)
 
 
-    def fill_triangle(self, x1: int, y1: int, x2: int, y2: int, x3: int, y3: int, char: str, col: str):
+    def fill_triangle(self, x1: int, y1: int, x2: int, y2: int, x3: int, y3: int, char: str, col: list):
         '''Fills tringle in based on coordinates'''
         changed1 = False
         changed2 = False
