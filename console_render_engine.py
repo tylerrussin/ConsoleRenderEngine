@@ -531,3 +531,57 @@ class ConsoleRenderEngine:
             y += 1
             if y > y3:
                 return
+
+
+    def draw_circle(self, xc: int, yc: int, r: int, char: str, col: list):
+
+        x = 0
+        y = r
+        p = 3 - 2 * r
+        if not r:
+            return
+
+        while y >= x: # only formulate 1/8 of circle
+
+            self.draw(xc - x, yc - y, char, col)    # upper left left
+            self.draw(xc - y, yc - x, char, col)    # upper upper left
+            self.draw(xc + y, yc - x, char, col)    # upper upper right
+            self.draw(xc + x, yc - y, char, col)    # upper right right
+            self.draw(xc - x, yc + y, char, col)    # lower left left
+            self.draw(xc - y, yc + x, char, col)    # lower lower left
+            self.draw(xc + y, yc + x, char, col)    # lower lower right
+            self.draw(xc + x, yc + y, char, col)    # lower right right
+    
+            x += 1
+
+            if p < 0:
+                p += 4 * x + 6
+            else:
+                y -= 1
+                p += 4 * (x - y) + 10
+
+
+    def fill_circle(self, xc: int, yc: int, r: int, char: str, col: list):
+
+        # Taken from wikipedia
+        x = 0
+        y = r
+        p = 3 - 2 * r
+        if not r:
+            return
+
+        while y >= x:
+
+            # Modified to draw scan-lines instead of edges
+            self.__fill_line(xc - x, xc + x, yc - y, char, col)
+            self.__fill_line(xc - y, xc + y, yc - x, char, col)
+            self.__fill_line(xc - x, xc + x, yc + y, char, col)
+            self.__fill_line(xc - y, xc + y, yc + x, char, col)
+
+            x += 1
+
+            if p < 0:
+                p += 4 * x + 6
+            else:
+                y -= 1
+                p += 4 * (x - y) + 10
